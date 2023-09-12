@@ -24,6 +24,7 @@ defmodule DerbyLive.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import DerbyLive.DataCase
+      import DerbyLive.Factory
     end
   end
 
