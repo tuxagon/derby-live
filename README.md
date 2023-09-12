@@ -1,18 +1,21 @@
 # DerbyLive
 
-To start your Phoenix server:
+This app is a live front end for [Gran Prix Race Manager](https://grandprix-software-central.com/).
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Dev Notes about Gran Prix Race Manager
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+SQLite is used for the database and here are some relevant queries.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+For grabbing racers
 
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+```sql
+SELECT
+  RacerID as 'racer_id',
+  LastName as 'last_name',
+  FirstName as 'first_name',
+  CarNumber as 'car_number',
+  CarName as 'car_name',
+  Class as 'group',
+  Rank as 'rank'
+FROM qryRoster qr
+```
