@@ -114,4 +114,23 @@ defmodule DerbyLive.RacingTest do
       assert_raise Ecto.NoResultsError, fn -> DerbyLive.Racing.get_racer_heat!(racer_heat.id) end
     end
   end
+
+  describe "heats" do
+    test "list_heats/0 returns all heats as map" do
+      [racer1, racer2, racer3, racer4] = insert_list(4, :racer)
+      racer_heat1 = insert(:racer_heat, racer_id: racer1.racer_id, heat_number: 1)
+      racer_heat2 = insert(:racer_heat, racer_id: racer2.racer_id, heat_number: 1)
+      racer_heat3 = insert(:racer_heat, racer_id: racer3.racer_id, heat_number: 1)
+      racer_heat4 = insert(:racer_heat, racer_id: racer4.racer_id, heat_number: 1)
+
+      assert DerbyLive.Racing.list_heats() == %{
+               1 => [
+                 {racer1, racer_heat1},
+                 {racer2, racer_heat2},
+                 {racer3, racer_heat3},
+                 {racer4, racer_heat4}
+               ]
+             }
+    end
+  end
 end

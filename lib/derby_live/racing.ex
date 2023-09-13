@@ -1,4 +1,6 @@
 defmodule DerbyLive.Racing do
+  import Ecto.Query
+
   alias DerbyLive.Repo
   alias DerbyLive.Racing.Racer
   alias DerbyLive.Racing.RacerHeat
@@ -49,5 +51,16 @@ defmodule DerbyLive.Racing do
 
   def delete_racer_heat(racer_heat) do
     Repo.delete(racer_heat)
+  end
+
+  def list_heats do
+    from(rh in RacerHeat,
+      join: r in Racer,
+      on: rh.racer_id == r.racer_id,
+      order_by: [asc: rh.heat_number],
+      select: {r, rh}
+    )
+    |> Repo.all()
+    |> Enum.group_by(fn {_r, rh} -> rh.heat_number end)
   end
 end
