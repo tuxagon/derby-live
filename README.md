@@ -20,13 +20,13 @@ SELECT
 FROM qryRoster qr
 ```
 
-For grabbing heats and times
+For grabbing racer_heats and times
 
 ```sql
 SELECT
   ri.CarNumber as 'car_number',
   ri.RacerID as 'racer_id',
-  rc.Heat as 'heat_number',
+  rc.RacerHeat as 'racer_heat_number',
   rc.FinishTime as 'finish_seconds',
   rc.FinishPlace as 'finish_place',
   c.Class as 'group',

@@ -1,7 +1,7 @@
 defmodule DerbyLive.Racing do
   alias DerbyLive.Repo
   alias DerbyLive.Racing.Racer
-  alias DerbyLive.Racing.Heat
+  alias DerbyLive.Racing.RacerHeat
 
   def list_racers do
     Repo.all(Racer)
@@ -27,27 +27,27 @@ defmodule DerbyLive.Racing do
     Repo.delete(racer)
   end
 
-  def list_heats do
-    Repo.all(Heat)
+  def list_racer_heats do
+    Repo.all(RacerHeat)
   end
 
-  def get_heat!(id) do
-    Repo.get!(Heat, id)
+  def get_racer_heat!(id) do
+    Repo.get!(RacerHeat, id)
   end
 
-  def create_heat(attrs \\ %{}) do
-    %Heat{}
-    |> Heat.changeset(attrs)
+  def create_racer_heat(attrs \\ %{}) do
+    %RacerHeat{}
+    |> RacerHeat.changeset(attrs)
     |> Repo.insert()
   end
 
-  def update_heat(heat, attrs) do
-    heat
-    |> Heat.changeset(attrs)
+  def update_racer_heat(racer_heat, attrs) do
+    racer_heat
+    |> RacerHeat.changeset(attrs)
     |> Repo.update()
   end
 
-  def delete_heat(heat) do
-    Repo.delete(heat)
+  def delete_racer_heat(racer_heat) do
+    Repo.delete(racer_heat)
   end
 end

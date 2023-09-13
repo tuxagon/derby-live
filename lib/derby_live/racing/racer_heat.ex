@@ -1,11 +1,10 @@
-defmodule DerbyLive.Racing.Heat do
+defmodule DerbyLive.Racing.RacerHeat do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "heats" do
+  schema "racer_heats" do
     field :group, :string
     field :racer_id, :integer
-    field :rank, :string
     field :heat_number, :integer
     field :lane_number, :integer
     field :car_number, :integer
@@ -17,12 +16,11 @@ defmodule DerbyLive.Racing.Heat do
   end
 
   @doc false
-  def changeset(heat, attrs) do
-    heat
+  def changeset(racer_heat, attrs) do
+    racer_heat
     |> cast(attrs, [
       :racer_id,
       :group,
-      :rank,
       :heat_number,
       :lane_number,
       :car_number,
@@ -30,6 +28,6 @@ defmodule DerbyLive.Racing.Heat do
       :finish_place,
       :finished_at
     ])
-    |> validate_required([:racer_id, :group, :rank, :heat_number, :lane_number, :car_number])
+    |> validate_required([:racer_id, :group, :heat_number, :lane_number, :car_number])
   end
 end

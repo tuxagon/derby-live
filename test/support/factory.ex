@@ -2,7 +2,7 @@ defmodule DerbyLive.Factory do
   use ExMachina.Ecto, repo: DerbyLive.Repo
 
   alias DerbyLive.Racing.Racer
-  alias DerbyLive.Racing.Heat
+  alias DerbyLive.Racing.RacerHeat
 
   @ranks ["Lions", "Tigers", "Wolves", "Bears", "Webelos", "Arrow of Light"]
 
@@ -18,11 +18,10 @@ defmodule DerbyLive.Factory do
     }
   end
 
-  def heat_factory do
-    %Heat{
+  def racer_heat_factory do
+    %RacerHeat{
       group: "Cubs",
       racer_id: sequence(:racer_id, &(&1 + 1), start_at: 1),
-      rank: sequence(:rank, @ranks),
       heat_number: sequence(:heat_number, &(&1 + 1), start_at: 1),
       lane_number: sequence(:lane_number, &(&1 + 1), start_at: 1),
       car_number: sequence(:car_number, &(&1 + 1), start_at: 1),

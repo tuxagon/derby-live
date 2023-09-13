@@ -1,11 +1,10 @@
-defmodule DerbyLive.Repo.Migrations.CreateHeats do
+defmodule DerbyLive.Repo.Migrations.CreateRacerHeats do
   use Ecto.Migration
 
   def change do
-    create table(:heats) do
+    create table(:racer_heats) do
       add :racer_id, :integer
       add :group, :string
-      add :rank, :string
       add :heat_number, :integer
       add :lane_number, :integer
       add :car_number, :integer

@@ -57,41 +57,39 @@ defmodule DerbyLive.RacingTest do
     end
   end
 
-  describe "heats" do
-    alias DerbyLive.Racing.Heat
+  describe "racer_heats" do
+    alias DerbyLive.Racing.RacerHeat
 
-    test "list_heats/0 returns all heats" do
-      heat = insert(:heat)
-      assert DerbyLive.Racing.list_heats() == [heat]
+    test "list_racer_heats/0 returns all racer_heats" do
+      racer_heat = insert(:racer_heat)
+      assert DerbyLive.Racing.list_racer_heats() == [racer_heat]
     end
 
-    test "get_heat!/1 returns heat" do
-      heat = insert(:heat)
-      assert DerbyLive.Racing.get_heat!(heat.id) == heat
+    test "get_racer_heat!/1 returns racer_heat" do
+      racer_heat = insert(:racer_heat)
+      assert DerbyLive.Racing.get_racer_heat!(racer_heat.id) == racer_heat
     end
 
-    test "create_heat/1 creates heat" do
-      attrs = params_for(:heat)
-      {:ok, heat} = DerbyLive.Racing.create_heat(attrs)
-      assert heat.group == attrs[:group]
-      assert heat.racer_id == attrs[:racer_id]
-      assert heat.rank == attrs[:rank]
-      assert heat.heat_number == attrs[:heat_number]
-      assert heat.lane_number == attrs[:lane_number]
-      assert heat.car_number == attrs[:car_number]
-      assert heat.finish_seconds == attrs[:finish_seconds]
-      assert heat.finish_place == attrs[:finish_place]
-      assert heat.finished_at == attrs[:finished_at]
+    test "create_racer_heat/1 creates racer_heat" do
+      attrs = params_for(:racer_heat)
+      {:ok, racer_heat} = DerbyLive.Racing.create_racer_heat(attrs)
+      assert racer_heat.group == attrs[:group]
+      assert racer_heat.racer_id == attrs[:racer_id]
+      assert racer_heat.heat_number == attrs[:heat_number]
+      assert racer_heat.lane_number == attrs[:lane_number]
+      assert racer_heat.car_number == attrs[:car_number]
+      assert racer_heat.finish_seconds == attrs[:finish_seconds]
+      assert racer_heat.finish_place == attrs[:finish_place]
+      assert racer_heat.finished_at == attrs[:finished_at]
     end
 
-    test "update_heat/2 updates heat" do
-      heat = insert(:heat)
+    test "update_racer_heat/2 updates racer_heat" do
+      racer_heat = insert(:racer_heat)
 
       attrs = %{
         group: "Cubs",
         racer_id: 1,
-        rank: "Tigers",
-        heat_number: 1,
+        racer_heat_number: 1,
         lane_number: 1,
         car_number: 1,
         finish_seconds: 1.0,
@@ -99,22 +97,21 @@ defmodule DerbyLive.RacingTest do
         finished_at: ~U[2023-01-01 00:00:00Z]
       }
 
-      {:ok, heat} = DerbyLive.Racing.update_heat(heat, attrs)
-      assert heat.group == attrs[:group]
-      assert heat.racer_id == attrs[:racer_id]
-      assert heat.rank == attrs[:rank]
-      assert heat.heat_number == attrs[:heat_number]
-      assert heat.lane_number == attrs[:lane_number]
-      assert heat.car_number == attrs[:car_number]
-      assert heat.finish_seconds == attrs[:finish_seconds]
-      assert heat.finish_place == attrs[:finish_place]
-      assert heat.finished_at == attrs[:finished_at]
+      {:ok, racer_heat} = DerbyLive.Racing.update_racer_heat(racer_heat, attrs)
+      assert racer_heat.group == attrs[:group]
+      assert racer_heat.racer_id == attrs[:racer_id]
+      assert racer_heat.heat_number == attrs[:heat_number]
+      assert racer_heat.lane_number == attrs[:lane_number]
+      assert racer_heat.car_number == attrs[:car_number]
+      assert racer_heat.finish_seconds == attrs[:finish_seconds]
+      assert racer_heat.finish_place == attrs[:finish_place]
+      assert racer_heat.finished_at == attrs[:finished_at]
     end
 
-    test "delete_heat/1 deletes heat" do
-      heat = insert(:heat)
-      assert {:ok, %Heat{}} = DerbyLive.Racing.delete_heat(heat)
-      assert_raise Ecto.NoResultsError, fn -> DerbyLive.Racing.get_heat!(heat.id) end
+    test "delete_racer_heat/1 deletes racer_heat" do
+      racer_heat = insert(:racer_heat)
+      assert {:ok, %RacerHeat{}} = DerbyLive.Racing.delete_racer_heat(racer_heat)
+      assert_raise Ecto.NoResultsError, fn -> DerbyLive.Racing.get_racer_heat!(racer_heat.id) end
     end
   end
 end
