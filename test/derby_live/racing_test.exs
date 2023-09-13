@@ -56,4 +56,65 @@ defmodule DerbyLive.RacingTest do
       assert_raise Ecto.NoResultsError, fn -> DerbyLive.Racing.get_racer!(racer.id) end
     end
   end
+
+  describe "heats" do
+    alias DerbyLive.Racing.Heat
+
+    test "list_heats/0 returns all heats" do
+      heat = insert(:heat)
+      assert DerbyLive.Racing.list_heats() == [heat]
+    end
+
+    test "get_heat!/1 returns heat" do
+      heat = insert(:heat)
+      assert DerbyLive.Racing.get_heat!(heat.id) == heat
+    end
+
+    test "create_heat/1 creates heat" do
+      attrs = params_for(:heat)
+      {:ok, heat} = DerbyLive.Racing.create_heat(attrs)
+      assert heat.group == attrs[:group]
+      assert heat.racer_id == attrs[:racer_id]
+      assert heat.rank == attrs[:rank]
+      assert heat.heat_number == attrs[:heat_number]
+      assert heat.lane_number == attrs[:lane_number]
+      assert heat.car_number == attrs[:car_number]
+      assert heat.finish_seconds == attrs[:finish_seconds]
+      assert heat.finish_place == attrs[:finish_place]
+      assert heat.finished_at == attrs[:finished_at]
+    end
+
+    test "update_heat/2 updates heat" do
+      heat = insert(:heat)
+
+      attrs = %{
+        group: "Cubs",
+        racer_id: 1,
+        rank: "Tigers",
+        heat_number: 1,
+        lane_number: 1,
+        car_number: 1,
+        finish_seconds: 1.0,
+        finish_place: 1,
+        finished_at: ~U[2023-01-01 00:00:00Z]
+      }
+
+      {:ok, heat} = DerbyLive.Racing.update_heat(heat, attrs)
+      assert heat.group == attrs[:group]
+      assert heat.racer_id == attrs[:racer_id]
+      assert heat.rank == attrs[:rank]
+      assert heat.heat_number == attrs[:heat_number]
+      assert heat.lane_number == attrs[:lane_number]
+      assert heat.car_number == attrs[:car_number]
+      assert heat.finish_seconds == attrs[:finish_seconds]
+      assert heat.finish_place == attrs[:finish_place]
+      assert heat.finished_at == attrs[:finished_at]
+    end
+
+    test "delete_heat/1 deletes heat" do
+      heat = insert(:heat)
+      assert {:ok, %Heat{}} = DerbyLive.Racing.delete_heat(heat)
+      assert_raise Ecto.NoResultsError, fn -> DerbyLive.Racing.get_heat!(heat.id) end
+    end
+  end
 end
