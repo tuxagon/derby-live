@@ -89,12 +89,12 @@ defmodule DerbyLive.RacingTest do
       attrs = %{
         group: "Cubs",
         racer_id: 1,
-        racer_heat_number: 1,
+        heat_number: 1,
         lane_number: 1,
         car_number: 1,
         finish_seconds: 1.0,
         finish_place: 1,
-        finished_at: ~U[2023-01-01 00:00:00Z]
+        finished_at: ~N[2023-01-01 00:00:00]
       }
 
       {:ok, racer_heat} = DerbyLive.Racing.update_racer_heat(racer_heat, attrs)

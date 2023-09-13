@@ -10,7 +10,7 @@ defmodule DerbyLive.Racing.RacerHeat do
     field :car_number, :integer
     field :finish_seconds, :float
     field :finish_place, :integer
-    field :finished_at, :utc_datetime
+    field :finished_at, :naive_datetime
 
     timestamps()
   end

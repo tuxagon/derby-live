@@ -10,7 +10,7 @@ defmodule DerbyLive.Repo.Migrations.CreateRacerHeats do
       add :car_number, :integer
       add :finish_seconds, :float
       add :finish_place, :integer
-      add :finished_at, :utc_datetime
+      add :finished_at, :naive_datetime
 
       timestamps()
     end
