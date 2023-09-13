@@ -2,22 +2,38 @@
 #
 #     mix run priv/repo/seeds.exs
 #
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     DerbyLive.Repo.insert!(%DerbyLive.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
 
-for n <- 1..24 do
-  DerbyLive.Repo.insert!(%DerbyLive.Racing.Racer{
-    racer_id: n,
-    first_name: Faker.Name.first_name(),
-    last_name: Faker.Name.last_name(),
-    rank: Enum.random(["Lions", "Tigers", "Wolves", "Bears", "Webelos", "Arrow of Light"]),
-    group: "Cubs",
-    car_name: Faker.Company.name(),
-    car_number: n + 100
-  })
-end
+alias DerbyLive.Repo
+alias DerbyLive.Racing.Racer
+alias DerbyLive.Racing.RacerHeat
+
+Repo.delete_all(Racer)
+Repo.delete_all(RacerHeat)
+
+num_racers = 24
+
+group = "Cubs"
+ranks = ["Lions", "Tigers", "Wolves", "Bears", "Webelos", "Arrow of Light"]
+
+1..num_racers
+|> Enum.each(fn car_number ->
+  first_name = Faker.Person.first_name()
+  last_name = Faker.Person.last_name()
+
+  car_name =
+    if Enum.random([true, false]), do: "#{Faker.Color.name()} #{Faker.Pokemon.name()}", else: nil
+
+  rank = Enum.random(ranks)
+
+  racer = %Racer{
+    racer_id: car_number,
+    group: group,
+    first_name: first_name,
+    last_name: last_name,
+    rank: rank,
+    car_name: car_name,
+    car_number: car_number + 100
+  }
+
+  Repo.insert!(racer)
+end)
