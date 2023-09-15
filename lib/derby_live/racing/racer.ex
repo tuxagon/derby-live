@@ -20,4 +20,8 @@ defmodule DerbyLive.Racing.Racer do
     |> cast(attrs, [:racer_id, :first_name, :last_name, :rank, :group, :car_name, :car_number])
     |> validate_required([:racer_id, :first_name, :last_name, :rank, :group, :car_number])
   end
+
+  def importable_fields do
+    ["racer_id", "first_name", "last_name", "rank", "group", "car_name", "car_number"]
+  end
 end

@@ -1,6 +1,7 @@
 defmodule DerbyLive.RacingTest do
-  alias DerbyLive.Racing.Racer
   use DerbyLive.DataCase, async: true
+
+  alias DerbyLive.Racing.Racer
 
   describe "racers" do
     alias DerbyLive.Racing.Racer

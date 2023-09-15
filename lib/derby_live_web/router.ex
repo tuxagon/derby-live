@@ -19,6 +19,8 @@ defmodule DerbyLiveWeb.Router do
 
     get "/", PageController, :home
 
+    post "/data", DataController, :import
+
     live "/heats", HeatLive
     live "/racers", RacerLive
   end

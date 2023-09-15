@@ -30,4 +30,17 @@ defmodule DerbyLive.Racing.RacerHeat do
     ])
     |> validate_required([:racer_id, :group, :heat_number, :lane_number, :car_number])
   end
+
+  def importable_fields do
+    [
+      "racer_id",
+      "group",
+      "heat_number",
+      "lane_number",
+      "car_number",
+      "finish_seconds",
+      "finish_place",
+      "finished_at"
+    ]
+  end
 end
