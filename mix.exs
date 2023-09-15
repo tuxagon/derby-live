@@ -51,7 +51,8 @@ defmodule DerbyLive.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:ex_machina, "~> 2.7.0", only: :test},
-      {:faker, "~> 0.17"}
+      {:faker, "~> 0.17"},
+      {:phoenix_swoosh, "~> 1.0"}
     ]
   end
 
