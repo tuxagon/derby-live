@@ -30,6 +30,7 @@ defmodule DerbyLive.AccountTest do
   test "register_user/1 registers user" do
     attrs = params_for(:user)
     {:ok, user} = DerbyLive.Account.register_user(attrs)
+    assert user.name == attrs[:name]
     assert user.email == attrs[:email]
     assert String.length(user.auth_token) == 64
     assert fifteen_minutes_in_the_future?(user.auth_token_expires_at)

@@ -1,15 +1,14 @@
 defmodule DerbyLive.Account.UserNotifier do
   import Swoosh.Email
 
-  alias DerbyLive.Account.User
   alias DerbyLive.Mailer
 
   # TODO: Provide sender via config
   # TODO: Pull the link differently so that prod and dev are correct
 
-  def deliver_login_link(%User{email: email} = user) do
+  def deliver_login_link(user) do
     new()
-    |> to(email)
+    |> to(user)
     |> from({"Derby Live", "noreply@placeholder.com"})
     |> subject("Login to Derby Live")
     |> html_body(build_html(user))

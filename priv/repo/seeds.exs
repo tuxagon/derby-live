@@ -3,12 +3,21 @@
 #     mix run priv/repo/seeds.exs
 #
 
+alias DerbyLive.Account.User
 alias DerbyLive.Repo
 alias DerbyLive.Racing.Racer
 alias DerbyLive.Racing.RacerHeat
 
+Repo.delete_all(User)
 Repo.delete_all(Racer)
 Repo.delete_all(RacerHeat)
+
+user = %User{
+  name: "Admin",
+  email: "admin@example.com"
+}
+
+Repo.insert!(user)
 
 num_racers = 24
 num_lanes = 4

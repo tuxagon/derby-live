@@ -34,6 +34,7 @@ defmodule DerbyLive.Factory do
 
   def user_factory do
     %User{
+      name: Faker.Person.name(),
       email: Faker.Internet.email(),
       auth_token: Faker.UUID.v4(),
       auth_token_expires_at:

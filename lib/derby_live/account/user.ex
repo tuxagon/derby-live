@@ -2,11 +2,14 @@ defmodule DerbyLive.Account.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Swoosh.Email.Recipient, name: :name, address: :email}
+
   @auth_token_length 64
   # 15 minutes
   @auth_token_expires_after 60 * 15
 
   schema "users" do
+    field :name, :string
     field :email, :string
     field :auth_token, :string
     field :auth_token_expires_at, :naive_datetime
@@ -17,8 +20,8 @@ defmodule DerbyLive.Account.User do
   @doc false
   def registration_changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :auth_token, :auth_token_expires_at])
-    |> validate_required([:email])
+    |> cast(attrs, [:name, :email, :auth_token, :auth_token_expires_at])
+    |> validate_required([:name, :email])
     |> unique_constraint(:email)
     |> gen_auth_token()
     |> set_auth_token_expires_at()

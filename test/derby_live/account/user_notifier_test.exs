@@ -12,7 +12,7 @@ defmodule DerbyLive.Account.UserNotifierTest do
 
     assert_email_sent(
       subject: "Login to Derby Live",
-      to: user.email,
+      to: {user.name, user.email},
       text_body: ~r/#{user.auth_token}/
     )
   end
