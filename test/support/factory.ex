@@ -1,6 +1,7 @@
 defmodule DerbyLive.Factory do
   use ExMachina.Ecto, repo: DerbyLive.Repo
 
+  alias DerbyLive.Account.User
   alias DerbyLive.Racing.Racer
   alias DerbyLive.Racing.RacerHeat
 
@@ -28,6 +29,15 @@ defmodule DerbyLive.Factory do
       finish_seconds: nil,
       finish_place: nil,
       finished_at: nil
+    }
+  end
+
+  def user_factory do
+    %User{
+      email: Faker.Internet.email(),
+      auth_token: Faker.UUID.v4(),
+      auth_token_expires_at:
+        DateTime.utc_now() |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
     }
   end
 end
