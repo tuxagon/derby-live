@@ -20,7 +20,7 @@ defmodule DerbyLive.Account.User do
   @doc false
   def registration_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :auth_token, :auth_token_expires_at])
+    |> cast(attrs, [:name, :email])
     |> validate_required([:name, :email])
     |> unique_constraint(:email)
     |> gen_auth_token()

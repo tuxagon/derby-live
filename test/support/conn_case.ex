@@ -28,6 +28,7 @@ defmodule DerbyLiveWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import DerbyLiveWeb.ConnCase
+      import DerbyLive.Factory
     end
   end
 

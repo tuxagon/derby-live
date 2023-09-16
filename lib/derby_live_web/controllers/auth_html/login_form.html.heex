@@ -1,0 +1,6 @@
+<.simple_form :let={f} for={@form} action={@action}>
+  <.input field={f[:email]} type="email" label="Email" />
+  <:actions>
+    <.button>Send login link</.button>
+  </:actions>
+</.simple_form>

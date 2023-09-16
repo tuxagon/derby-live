@@ -18,6 +18,9 @@ defmodule DerbyLiveWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/auth", AuthController, :index
+    post "/auth/login", AuthController, :login
+    get "/auth/verify/:token", AuthController, :verify
 
     post "/data", DataController, :import
 
