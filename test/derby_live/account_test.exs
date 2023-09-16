@@ -12,19 +12,48 @@ defmodule DerbyLive.AccountTest do
     nowish < datetime && datetime < NaiveDateTime.add(nowish, 60 * 16)
   end
 
-  test "get_user!/1 returns user" do
-    user = insert(:user)
-    assert DerbyLive.Account.get_user!(user.id) == user
+  describe "get_user!/1" do
+    test "returns user if it exists" do
+      user = insert(:user)
+      assert DerbyLive.Account.get_user!(user.id) == user
+    end
+
+    test "raises if user does not exist" do
+      assert_raise Ecto.NoResultsError, fn -> DerbyLive.Account.get_user!(0) end
+    end
   end
 
-  test "get_user_by_email/1 returns user" do
-    user = insert(:user)
-    assert DerbyLive.Account.get_user_by_email(user.email) == user
+  describe "get_user_by_id/1" do
+    test "returns user if it exists" do
+      user = insert(:user)
+      assert DerbyLive.Account.get_user_by_id(user.id) == user
+    end
+
+    test "returns nil if user does not exist" do
+      refute DerbyLive.Account.get_user_by_id(0)
+    end
   end
 
-  test "get_user_by_auth_token/1 returns user" do
-    user = insert(:user)
-    assert DerbyLive.Account.get_user_by_auth_token(user.auth_token) == user
+  describe "get_user_by_email/1" do
+    test "returns user with matching email" do
+      user = insert(:user)
+      assert DerbyLive.Account.get_user_by_email(user.email) == user
+    end
+
+    test "returns nil if no user has matching email" do
+      refute DerbyLive.Account.get_user_by_email("fake@example.com")
+    end
+  end
+
+  describe "get_user_by_auth_token/1" do
+    test "returns user with matching auth token" do
+      user = insert(:user)
+      assert DerbyLive.Account.get_user_by_auth_token(user.auth_token) == user
+    end
+
+    test "returns nil if no user has matching auth token" do
+      refute DerbyLive.Account.get_user_by_auth_token("fake-auth-token")
+    end
   end
 
   test "register_user/1 registers user" do

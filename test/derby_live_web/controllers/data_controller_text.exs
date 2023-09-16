@@ -1,9 +1,9 @@
 defmodule DerbyLiveWeb.DataControllerTest do
   use DerbyLiveWeb.ConnCase
 
-  test "POST /data for racers", %{conn: conn} do
+  test "POST /api/data for racers", %{conn: conn} do
     conn =
-      post(conn, "/data", %{
+      post(conn, "/api/data", %{
         "racers" => [
           %{
             "racer_id" => 1,
@@ -20,9 +20,9 @@ defmodule DerbyLiveWeb.DataControllerTest do
     assert json_response(conn, 200) == %{"status" => "ok"}
   end
 
-  test "POST /data for racer_heats", %{conn: conn} do
+  test "POST /api/data for racer_heats", %{conn: conn} do
     conn =
-      post(conn, "/data", %{
+      post(conn, "/api/data", %{
         "racer_heats" => [
           %{
             "racer_id" => 1,

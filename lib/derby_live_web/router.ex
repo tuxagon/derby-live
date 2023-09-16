@@ -1,6 +1,8 @@
 defmodule DerbyLiveWeb.Router do
   use DerbyLiveWeb, :router
 
+  import DerbyLiveWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,10 +10,13 @@ defmodule DerbyLiveWeb.Router do
     plug :put_root_layout, html: {DerbyLiveWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
+
+    post "/api/data", DerbyLiveWeb.DataController, :import
   end
 
   scope "/", DerbyLiveWeb do
@@ -20,12 +25,23 @@ defmodule DerbyLiveWeb.Router do
     get "/", PageController, :home
     get "/auth", AuthController, :index
     post "/auth/login", AuthController, :login
+    delete "/auth/logout", AuthController, :logout
     get "/auth/verify/:token", AuthController, :verify
-
-    post "/data", DataController, :import
 
     live "/heats", HeatLive
     live "/racers", RacerLive
+  end
+
+  ## Authentication routes
+
+  scope "/", DerbyLiveWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{DerbyLiveWeb.UserAuth, :ensure_authenticated}] do
+      live "/events", EventLive, :index
+      live "/events/new", EventLive, :new
+    end
   end
 
   # Other scopes may use custom stacks.

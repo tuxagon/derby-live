@@ -14,7 +14,7 @@ defmodule DerbyLiveWeb.AuthControllerTest do
       user = insert(:user)
       conn = post(conn, ~p"/auth/login", %{email: user.email})
       assert "/auth" = redirected_to(conn)
-      assert %{"success" => "Check your email for a login link"} = conn.assigns.flash
+      assert %{"info" => "Check your email for a login link"} = conn.assigns.flash
 
       assert_email_sent(
         subject: "Login to Derby Live",
@@ -26,9 +26,17 @@ defmodule DerbyLiveWeb.AuthControllerTest do
     test "does not send email link for non-existing user", %{conn: conn} do
       conn = post(conn, ~p"/auth/login", %{email: "fake@example.com"})
       assert "/auth" = redirected_to(conn)
-      assert %{"success" => "Check your email for a login link"} = conn.assigns.flash
+      assert %{"info" => "Check your email for a login link"} = conn.assigns.flash
 
       assert_no_email_sent()
+    end
+  end
+
+  describe "logout" do
+    test "logout", %{conn: conn} do
+      conn = delete(conn, ~p"/auth/logout")
+      assert "/auth" = redirected_to(conn)
+      refute get_session(conn, :current_user_id)
     end
   end
 
@@ -36,7 +44,7 @@ defmodule DerbyLiveWeb.AuthControllerTest do
     test "redirects to root for valid token", %{conn: conn} do
       user = insert(:user)
       conn = get(conn, ~p"/auth/verify/#{user.auth_token}")
-      assert "/" = redirected_to(conn)
+      assert "/events" = redirected_to(conn)
       assert user.id == get_session(conn, :current_user_id)
     end
 

@@ -36,4 +36,30 @@ defmodule DerbyLiveWeb.ConnCase do
     DerbyLive.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
+
+  @doc """
+  Setup helper that registers and logs in celebs.
+
+      setup :register_and_log_in_celeb
+
+  It stores an updated connection and a registered celeb in the
+  test context.
+  """
+  def register_and_log_in_celeb(%{conn: conn}) do
+    celeb = DerbyLive.VipFixtures.celeb_fixture()
+    %{conn: log_in_celeb(conn, celeb), celeb: celeb}
+  end
+
+  @doc """
+  Logs the given `celeb` into the `conn`.
+
+  It returns an updated `conn`.
+  """
+  def log_in_celeb(conn, celeb) do
+    token = DerbyLive.Vip.generate_celeb_session_token(celeb)
+
+    conn
+    |> Phoenix.ConnTest.init_test_session(%{})
+    |> Plug.Conn.put_session(:celeb_token, token)
+  end
 end

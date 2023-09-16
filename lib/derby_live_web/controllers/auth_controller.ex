@@ -2,6 +2,7 @@ defmodule DerbyLiveWeb.AuthController do
   use DerbyLiveWeb, :controller
 
   alias DerbyLive.Account
+  alias DerbyLiveWeb.UserAuth
 
   def index(conn, _params) do
     conn = assign(conn, :form, %{"email" => ""})
@@ -14,22 +15,26 @@ defmodule DerbyLiveWeb.AuthController do
         Account.send_login_link_email(user)
 
         conn
-        |> put_flash(:success, "Check your email for a login link")
+        |> put_flash(:info, "Check your email for a login link")
         |> redirect(to: ~p"/auth")
 
       nil ->
         conn
-        |> put_flash(:success, "Check your email for a login link")
+        |> put_flash(:info, "Check your email for a login link")
         |> redirect(to: ~p"/auth")
     end
+  end
+
+  def logout(conn, _params) do
+    conn
+    |> UserAuth.log_out_user()
   end
 
   def verify(conn, %{"token" => token}) do
     case Account.get_user_by_auth_token(token) do
       %Account.User{} = user ->
         conn
-        |> put_session(:current_user_id, user.id)
-        |> redirect(to: "/")
+        |> UserAuth.log_in_user(user)
 
       nil ->
         conn
