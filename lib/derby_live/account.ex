@@ -19,6 +19,10 @@ defmodule DerbyLive.Account do
     Repo.get_by(User, auth_token: auth_token)
   end
 
+  def get_user_by_api_key(api_key) do
+    Repo.get_by(User, api_key: api_key)
+  end
+
   def register_user(attrs \\ %{}) do
     %User{}
     |> User.registration_changeset(attrs)

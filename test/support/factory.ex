@@ -36,6 +36,7 @@ defmodule DerbyLive.Factory do
     %User{
       name: Faker.Person.name(),
       email: Faker.Internet.email(),
+      api_key: Faker.UUID.v4(),
       auth_token: Faker.UUID.v4(),
       auth_token_expires_at:
         DateTime.utc_now() |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)

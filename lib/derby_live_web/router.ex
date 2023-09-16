@@ -1,6 +1,7 @@
 defmodule DerbyLiveWeb.Router do
   use DerbyLiveWeb, :router
 
+  import DerbyLiveWeb.ApiAuth
   import DerbyLiveWeb.UserAuth
 
   pipeline :browser do
@@ -15,8 +16,12 @@ defmodule DerbyLiveWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
 
-    post "/api/data", DerbyLiveWeb.DataController, :import
+  scope "/api", DerbyLiveWeb do
+    pipe_through [:api, :require_api_key]
+
+    post "/data", DataController, :import
   end
 
   scope "/", DerbyLiveWeb do
@@ -43,11 +48,6 @@ defmodule DerbyLiveWeb.Router do
       live "/events/new", EventLive, :new
     end
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", DerbyLiveWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:derby_live, :dev_routes) do

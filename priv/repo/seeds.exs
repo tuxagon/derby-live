@@ -14,7 +14,10 @@ Repo.delete_all(RacerHeat)
 
 user = %User{
   name: "Admin",
-  email: "admin@example.com"
+  email: "admin@example.com",
+  auth_token: "uLKkE3UlfzmiQ5L594egoruoA2JTfSadNnUknImWHWg8McsfmS9hSABqXMEldZZU",
+  auth_token_expires_at: NaiveDateTime.local_now() |> NaiveDateTime.add(30, :day),
+  api_key: "XAkUz3S6e8Kcae6Ks14QYmIMD9aZUtT4G3azdOyuOn8bGhyiHc1W4yGhw42KfKcV"
 }
 
 Repo.insert!(user)

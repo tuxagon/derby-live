@@ -56,6 +56,17 @@ defmodule DerbyLive.AccountTest do
     end
   end
 
+  describe "get_user_by_api_key/1" do
+    test "returns user with matching api key" do
+      user = insert(:user)
+      assert DerbyLive.Account.get_user_by_api_key(user.api_key) == user
+    end
+
+    test "returns nil if no user has matching api key" do
+      refute DerbyLive.Account.get_user_by_auth_token("fake-auth-token")
+    end
+  end
+
   test "register_user/1 registers user" do
     attrs = params_for(:user)
     {:ok, user} = DerbyLive.Account.register_user(attrs)

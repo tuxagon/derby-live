@@ -7,6 +7,7 @@ defmodule DerbyLive.Repo.Migrations.CreateUsers do
       add :email, :string
       add :auth_token, :string
       add :auth_token_expires_at, :naive_datetime
+      add :api_key, :string
 
       timestamps()
     end
