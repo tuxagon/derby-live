@@ -1,6 +1,7 @@
 defmodule DerbyLive.Account do
   alias DerbyLive.Repo
   alias DerbyLive.Account.User
+  alias DerbyLive.Account.UserNotifier
 
   def get_user!(id) do
     Repo.get!(User, id)
@@ -28,5 +29,9 @@ defmodule DerbyLive.Account do
     user
     |> User.reset_auth_token_changeset()
     |> Repo.update()
+  end
+
+  def send_login_link_email(user) do
+    UserNotifier.deliver_login_link(user)
   end
 end
