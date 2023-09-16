@@ -2,6 +2,12 @@
 
 This app is a live front end for [Gran Prix Race Manager](https://grandprix-software-central.com/).
 
+## Environment setup
+
+```
+SENDGRID_API_KEY=
+```
+
 ## Dev Notes about Gran Prix Race Manager
 
 SQLite is used for the database and here are some relevant queries.
