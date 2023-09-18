@@ -68,7 +68,10 @@ defmodule DerbyLiveWeb.EventLive.FormComponent do
   end
 
   defp save_event(socket, :new, event_params) do
-    case Racing.create_live_event(event_params) do
+    current_user = socket.assigns.current_user
+    event_params = Map.put(event_params, "user_id", current_user.id)
+
+    case Racing.create_event(event_params) do
       {:ok, event} ->
         notify_parent({:saved, event})
 

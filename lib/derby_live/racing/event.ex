@@ -2,39 +2,35 @@ defmodule DerbyLive.Racing.Event do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias DerbyLive.Account.User
+
   @key_length 24
 
   schema "events" do
     field :name, :string
-    field :status, :string
+    field :status, :string, default: "live"
     field :key, :string
+
+    belongs_to :user, User
 
     timestamps()
   end
 
   @doc false
-  def live_changeset(event, attrs) do
-    event
-    |> create_changeset(Enum.into(attrs, %{"status" => "live"}))
-  end
-
-  def archived_changeset(event) do
-    event
-    |> update_changeset(%{"status" => "archived"})
-  end
-
   def update_changeset(event, attrs) do
     event
     |> cast(attrs, [:name, :status])
     |> validate_required([:name, :status])
   end
 
-  defp create_changeset(event, attrs) do
+  def create_changeset(event, attrs) do
     event
-    |> cast(attrs, [:name, :status])
-    |> validate_required([:name, :status])
+    |> cast(attrs, [:name, :status, :user_id])
+    |> validate_required([:name, :status, :user_id])
     |> validate_inclusion(:status, ["live", "archived"])
-    |> gen_key
+    |> unique_constraint(:key)
+    |> assoc_constraint(:user)
+    |> gen_key()
   end
 
   # generate alphanumeric url prefix

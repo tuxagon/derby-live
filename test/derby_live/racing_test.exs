@@ -2,6 +2,11 @@ defmodule DerbyLive.RacingTest do
   use DerbyLive.DataCase, async: true
 
   alias DerbyLive.Racing
+  alias DerbyLive.Racing.Event
+
+  def reload_events(events), do: Enum.map(events, &reload_event/1)
+
+  def reload_event(event), do: Event |> Repo.get(event.id)
 
   describe "racers" do
     alias DerbyLive.Racing.Racer
@@ -136,15 +141,29 @@ defmodule DerbyLive.RacingTest do
   end
 
   describe "events" do
-    alias DerbyLive.Racing.Event
-
     test "list_events/0 returns all events" do
-      event = insert(:event)
-      assert Racing.list_events() == [event]
+      event1 = insert(:event)
+      event2 = insert(:event)
+
+      expected_events = reload_events([event1, event2])
+
+      assert Racing.list_events() == expected_events
+    end
+
+    test "list_my_events/1 returns all events for given user" do
+      user1 = insert(:user)
+      user2 = insert(:user)
+      event1 = insert(:event, user: user1)
+      event2 = insert(:event, user: user2)
+
+      [expected_event1, expected_event2] = reload_events([event1, event2])
+
+      assert Racing.list_my_events(user1) == [expected_event1]
+      assert Racing.list_my_events(user2) == [expected_event2]
     end
 
     test "get_event!/1 returns the event with given id" do
-      event = insert(:event)
+      event = insert(:event) |> reload_event
       assert Racing.get_event!(event.id) == event
     end
 
@@ -153,7 +172,7 @@ defmodule DerbyLive.RacingTest do
     end
 
     test "get_event_by_key/1 returns the event with given key" do
-      event = insert(:event)
+      event = insert(:event) |> reload_event
       assert Racing.get_event_by_key(event.key) == event
     end
 
@@ -161,10 +180,11 @@ defmodule DerbyLive.RacingTest do
       assert Racing.get_event_by_key("some url prefix") == nil
     end
 
-    test "create_live_event/1 with valid data creates a live event" do
-      valid_attrs = %{"name" => "some name"}
+    test "create_event/1 with valid data creates a live event" do
+      user = insert(:user)
+      valid_attrs = %{"name" => "some name", "user_id" => user.id}
 
-      assert {:ok, %Event{} = event} = Racing.create_live_event(valid_attrs)
+      assert {:ok, %Event{} = event} = Racing.create_event(valid_attrs)
       assert event.name == "some name"
       assert event.status == "live"
       assert String.length(event.key) >= 24
@@ -173,7 +193,7 @@ defmodule DerbyLive.RacingTest do
     test "create_event/1 with invalid data returns error changeset" do
       invalid_attrs = %{}
 
-      assert {:error, %Ecto.Changeset{}} = Racing.create_live_event(invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Racing.create_event(invalid_attrs)
     end
 
     test "update_event/2 with valid data updates the event" do
@@ -192,7 +212,7 @@ defmodule DerbyLive.RacingTest do
     end
 
     test "update_event/2 with invalid data returns error changeset" do
-      event = insert(:event)
+      event = insert(:event) |> reload_event
 
       update_attrs = %{
         name: nil

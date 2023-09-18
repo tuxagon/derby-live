@@ -6,7 +6,8 @@ defmodule DerbyLiveWeb.EventLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :events, Racing.list_events())}
+    user = socket.assigns.current_user
+    {:ok, stream(socket, :events, Racing.list_my_events(user))}
   end
 
   @impl true

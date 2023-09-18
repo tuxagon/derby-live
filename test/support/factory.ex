@@ -46,9 +46,10 @@ defmodule DerbyLive.Factory do
 
   def event_factory do
     %Event{
-      name: Faker.Lorem.sentence(),
+      name: sequence(:name, &"Sample Event#{&1}"),
       status: "live",
-      key: Faker.UUID.v4()
+      key: Faker.UUID.v4(),
+      user: build(:user)
     }
   end
 end

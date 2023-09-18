@@ -7,8 +7,8 @@ defmodule DerbyLiveWeb.EventLiveTest do
   @update_attrs %{name: "some updated name"}
   @invalid_attrs %{name: nil}
 
-  defp create_event(_) do
-    event = insert(:event)
+  defp create_event(%{user: user}) do
+    event = insert(:event, user: user)
     %{event: event}
   end
 

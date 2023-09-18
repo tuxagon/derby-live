@@ -71,15 +71,24 @@ defmodule DerbyLive.Racing do
     Repo.all(Event)
   end
 
+  def list_my_events(user) do
+    from(e in Event,
+      where: e.user_id == ^user.id,
+      order_by: [asc: e.name],
+      select: e
+    )
+    |> Repo.all()
+  end
+
   def get_event!(id), do: Repo.get!(Event, id)
 
   def get_event_by_key(key) do
     Repo.get_by(Event, key: key)
   end
 
-  def create_live_event(attrs \\ %{}) do
+  def create_event(attrs \\ %{}) do
     %Event{}
-    |> Event.live_changeset(attrs)
+    |> Event.create_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -91,7 +100,7 @@ defmodule DerbyLive.Racing do
 
   def archive_event(%Event{} = event) do
     event
-    |> Event.archived_changeset()
+    |> Event.update_changeset(%{status: "archived"})
     |> Repo.update()
   end
 
