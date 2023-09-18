@@ -2,6 +2,8 @@ defmodule DerbyLive.Racing.RacerHeat do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias DerbyLive.Racing.Event
+
   schema "racer_heats" do
     field :group, :string
     field :racer_id, :integer
@@ -11,6 +13,8 @@ defmodule DerbyLive.Racing.RacerHeat do
     field :finish_seconds, :float
     field :finish_place, :integer
     field :finished_at, :naive_datetime
+
+    belongs_to :event, Event
 
     timestamps()
   end
@@ -26,9 +30,10 @@ defmodule DerbyLive.Racing.RacerHeat do
       :car_number,
       :finish_seconds,
       :finish_place,
-      :finished_at
+      :finished_at,
+      :event_id
     ])
-    |> validate_required([:racer_id, :group, :heat_number, :lane_number, :car_number])
+    |> validate_required([:racer_id, :group, :heat_number, :lane_number, :car_number, :event_id])
   end
 
   def importable_fields do

@@ -4,8 +4,17 @@ defmodule DerbyLive.Racing do
   alias DerbyLive.Repo
   alias DerbyLive.Racing.Racer
 
-  def list_racers do
+  def list_racers() do
     Repo.all(Racer)
+  end
+
+  def list_racers_by_event(event) do
+    from(r in Racer,
+      where: r.event_id == ^event.id,
+      order_by: [asc: r.group, asc: r.car_number],
+      select: r
+    )
+    |> Repo.all()
   end
 
   def get_racer!(id) do
@@ -34,6 +43,15 @@ defmodule DerbyLive.Racing do
     Repo.all(RacerHeat)
   end
 
+  def list_racer_heats_by_event(event) do
+    from(rh in RacerHeat,
+      where: rh.event_id == ^event.id,
+      order_by: [asc: rh.heat_number, asc: rh.lane_number],
+      select: rh
+    )
+    |> Repo.all()
+  end
+
   def get_racer_heat!(id) do
     Repo.get!(RacerHeat, id)
   end
@@ -54,10 +72,11 @@ defmodule DerbyLive.Racing do
     Repo.delete(racer_heat)
   end
 
-  def list_heats do
+  def list_heats_for_event(event) do
     from(rh in RacerHeat,
       join: r in Racer,
       on: rh.racer_id == r.racer_id,
+      where: rh.event_id == ^event.id,
       order_by: [asc: rh.heat_number],
       select: {r, rh}
     )

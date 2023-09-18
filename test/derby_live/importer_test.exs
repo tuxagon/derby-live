@@ -3,7 +3,9 @@ defmodule DerbyLive.ImporterTest do
 
   alias DerbyLive.Importer
 
-  test "import_racers/1 imports racers" do
+  test "import_racers/2 imports racers" do
+    event = insert(:event)
+
     racers = [
       %{
         "racer_id" => 1,
@@ -16,7 +18,7 @@ defmodule DerbyLive.ImporterTest do
       }
     ]
 
-    assert [{:ok, racer}] = Importer.import_racers(racers)
+    assert [{:ok, racer}] = Importer.import_racers(racers, event)
     assert racer.racer_id == 1
     assert racer.first_name == "John"
     assert racer.last_name == "Doe"
@@ -24,9 +26,12 @@ defmodule DerbyLive.ImporterTest do
     assert racer.group == "Cubs"
     assert racer.car_name == "The Tiger"
     assert racer.car_number == 101
+    assert racer.event_id == event.id
   end
 
-  test "import_racer_heats/1 imports racer heats" do
+  test "import_racer_heats/2 imports racer heats" do
+    event = insert(:event)
+
     racer_heats = [
       %{
         "racer_id" => 1,
@@ -40,7 +45,7 @@ defmodule DerbyLive.ImporterTest do
       }
     ]
 
-    assert [{:ok, racer_heat}] = Importer.import_racer_heats(racer_heats)
+    assert [{:ok, racer_heat}] = Importer.import_racer_heats(racer_heats, event)
     assert racer_heat.racer_id == 1
     assert racer_heat.group == "Cubs"
     assert racer_heat.heat_number == 1
@@ -49,5 +54,6 @@ defmodule DerbyLive.ImporterTest do
     assert racer_heat.finish_seconds == 2.0
     assert racer_heat.finish_place == 1
     assert racer_heat.finished_at == ~N[2019-01-01 12:00:00]
+    assert racer_heat.event_id == event.id
   end
 end

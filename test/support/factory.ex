@@ -16,7 +16,8 @@ defmodule DerbyLive.Factory do
       rank: sequence(:rank, @ranks),
       group: "Cubs",
       car_name: nil,
-      car_number: sequence(:car_number, &(&1 + 1), start_at: 1)
+      car_number: sequence(:car_number, &(&1 + 1), start_at: 1),
+      event: build(:event)
     }
   end
 
@@ -29,7 +30,8 @@ defmodule DerbyLive.Factory do
       car_number: sequence(:car_number, &(&1 + 1), start_at: 1),
       finish_seconds: nil,
       finish_place: nil,
-      finished_at: nil
+      finished_at: nil,
+      event: build(:event)
     }
   end
 

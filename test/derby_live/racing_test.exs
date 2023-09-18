@@ -3,26 +3,43 @@ defmodule DerbyLive.RacingTest do
 
   alias DerbyLive.Racing
   alias DerbyLive.Racing.Event
+  alias DerbyLive.Racing.Racer
+  alias DerbyLive.Racing.RacerHeat
 
   def reload_events(events), do: Enum.map(events, &reload_event/1)
 
   def reload_event(event), do: Event |> Repo.get(event.id)
 
+  def reload_racers(racers), do: Enum.map(racers, &reload_racer/1)
+
+  def reload_racer(racer), do: Racer |> Repo.get(racer.id)
+
+  def reload_racer_heats(racer_heats), do: Enum.map(racer_heats, &reload_racer_heat/1)
+
+  def reload_racer_heat(racer_heat), do: RacerHeat |> Repo.get(racer_heat.id)
+
   describe "racers" do
     alias DerbyLive.Racing.Racer
 
     test "list_racers/0 returns all racers" do
-      racer = insert(:racer)
+      racer = insert(:racer) |> reload_racer
       assert Racing.list_racers() == [racer]
     end
 
+    test "list_racers_by_event/1 returns all racers for given event" do
+      event = insert(:event)
+      [racer1, racer2] = insert_list(2, :racer, event: event) |> reload_racers
+      assert Racing.list_racers_by_event(event) == [racer1, racer2]
+    end
+
     test "get_racer!/1 returns racer" do
-      racer = insert(:racer)
+      racer = insert(:racer) |> reload_racer
       assert Racing.get_racer!(racer.id) == racer
     end
 
     test "create_racer/1 creates racer" do
-      attrs = params_for(:racer)
+      event = insert(:event)
+      attrs = params_for(:racer, event_id: event.id)
       {:ok, racer} = Racing.create_racer(attrs)
       assert racer.racer_id == attrs[:racer_id]
       assert racer.first_name == attrs[:first_name]
@@ -31,6 +48,7 @@ defmodule DerbyLive.RacingTest do
       assert racer.group == attrs[:group]
       assert racer.car_name == attrs[:car_name]
       assert racer.car_number == attrs[:car_number]
+      assert racer.event_id == event.id
     end
 
     test "update_racer/2 updates racer" do
@@ -54,6 +72,7 @@ defmodule DerbyLive.RacingTest do
       assert racer.group == attrs[:group]
       assert racer.car_name == attrs[:car_name]
       assert racer.car_number == attrs[:car_number]
+      assert racer.event_id == racer.event_id
     end
 
     test "delete_racer/1 deletes racer" do
@@ -67,17 +86,24 @@ defmodule DerbyLive.RacingTest do
     alias DerbyLive.Racing.RacerHeat
 
     test "list_racer_heats/0 returns all racer_heats" do
-      racer_heat = insert(:racer_heat)
+      racer_heat = insert(:racer_heat) |> reload_racer_heat
       assert Racing.list_racer_heats() == [racer_heat]
     end
 
+    test "list_racer_heats_by_event/1 returns all racer_heats for given event" do
+      event = insert(:event)
+      [racer_heat1, racer_heat2] = insert_list(2, :racer_heat, event: event) |> reload_racer_heats
+      assert Racing.list_racer_heats_by_event(event) == [racer_heat1, racer_heat2]
+    end
+
     test "get_racer_heat!/1 returns racer_heat" do
-      racer_heat = insert(:racer_heat)
+      racer_heat = insert(:racer_heat) |> reload_racer_heat
       assert Racing.get_racer_heat!(racer_heat.id) == racer_heat
     end
 
     test "create_racer_heat/1 creates racer_heat" do
-      attrs = params_for(:racer_heat)
+      event = insert(:event)
+      attrs = params_for(:racer_heat, event_id: event.id)
       {:ok, racer_heat} = Racing.create_racer_heat(attrs)
       assert racer_heat.group == attrs[:group]
       assert racer_heat.racer_id == attrs[:racer_id]
@@ -87,10 +113,12 @@ defmodule DerbyLive.RacingTest do
       assert racer_heat.finish_seconds == attrs[:finish_seconds]
       assert racer_heat.finish_place == attrs[:finish_place]
       assert racer_heat.finished_at == attrs[:finished_at]
+      assert racer_heat.event_id == event.id
     end
 
     test "update_racer_heat/2 updates racer_heat" do
-      racer_heat = insert(:racer_heat)
+      event = insert(:event)
+      racer_heat = insert(:racer_heat, event: event)
 
       attrs = %{
         group: "Cubs",
@@ -112,6 +140,7 @@ defmodule DerbyLive.RacingTest do
       assert racer_heat.finish_seconds == attrs[:finish_seconds]
       assert racer_heat.finish_place == attrs[:finish_place]
       assert racer_heat.finished_at == attrs[:finished_at]
+      assert racer_heat.event_id == event.id
     end
 
     test "delete_racer_heat/1 deletes racer_heat" do
@@ -122,14 +151,27 @@ defmodule DerbyLive.RacingTest do
   end
 
   describe "heats" do
-    test "list_heats/0 returns all heats as map" do
-      [racer1, racer2, racer3, racer4] = insert_list(4, :racer)
-      racer_heat1 = insert(:racer_heat, racer_id: racer1.racer_id, heat_number: 1)
-      racer_heat2 = insert(:racer_heat, racer_id: racer2.racer_id, heat_number: 1)
-      racer_heat3 = insert(:racer_heat, racer_id: racer3.racer_id, heat_number: 1)
-      racer_heat4 = insert(:racer_heat, racer_id: racer4.racer_id, heat_number: 1)
+    test "list_heats_for_event/1 returns all heats for an event as map" do
+      event = insert(:event) |> reload_event
+      [racer1, racer2, racer3, racer4] = insert_list(4, :racer, event: event) |> reload_racers
 
-      assert Racing.list_heats() == %{
+      racer_heat1 =
+        insert(:racer_heat, racer_id: racer1.racer_id, heat_number: 1, event: event)
+        |> reload_racer_heat
+
+      racer_heat2 =
+        insert(:racer_heat, racer_id: racer2.racer_id, heat_number: 1, event: event)
+        |> reload_racer_heat
+
+      racer_heat3 =
+        insert(:racer_heat, racer_id: racer3.racer_id, heat_number: 1, event: event)
+        |> reload_racer_heat
+
+      racer_heat4 =
+        insert(:racer_heat, racer_id: racer4.racer_id, heat_number: 1, event: event)
+        |> reload_racer_heat
+
+      assert Racing.list_heats_for_event(event) == %{
                1 => [
                  {racer1, racer_heat1},
                  {racer2, racer_heat2},

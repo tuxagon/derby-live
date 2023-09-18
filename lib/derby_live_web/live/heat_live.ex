@@ -4,7 +4,7 @@ defmodule DerbyLiveWeb.HeatLive do
   alias DerbyLive.Racing
 
   def mount(_params, _session, socket) do
-    heats = Racing.list_heats()
+    heats = Racing.list_heats_for_event(%DerbyLive.Racing.Event{})
     {:ok, assign(socket, :heats, heats)}
   end
 
