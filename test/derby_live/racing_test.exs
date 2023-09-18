@@ -152,13 +152,13 @@ defmodule DerbyLive.RacingTest do
       assert_raise Ecto.NoResultsError, fn -> Racing.get_event!(0) end
     end
 
-    test "get_event_by_url_prefix/1 returns the event with given url_prefix" do
+    test "get_event_by_key/1 returns the event with given key" do
       event = insert(:event)
-      assert Racing.get_event_by_url_prefix(event.url_prefix) == event
+      assert Racing.get_event_by_key(event.key) == event
     end
 
-    test "get_event_by_url_prefix/1 returns nil if event with given url_prefix does not exist" do
-      assert Racing.get_event_by_url_prefix("some url prefix") == nil
+    test "get_event_by_key/1 returns nil if event with given key does not exist" do
+      assert Racing.get_event_by_key("some url prefix") == nil
     end
 
     test "create_live_event/1 with valid data creates a live event" do
@@ -167,7 +167,7 @@ defmodule DerbyLive.RacingTest do
       assert {:ok, %Event{} = event} = Racing.create_live_event(valid_attrs)
       assert event.name == "some name"
       assert event.status == "live"
-      assert String.length(event.url_prefix) >= 24
+      assert String.length(event.key) >= 24
     end
 
     test "create_event/1 with invalid data returns error changeset" do
@@ -188,7 +188,7 @@ defmodule DerbyLive.RacingTest do
       assert {:ok, %Event{} = event} = Racing.update_event(event, update_attrs)
       assert event.name == "new name"
       assert event.status == original_event.status
-      assert event.url_prefix == original_event.url_prefix
+      assert event.key == original_event.key
     end
 
     test "update_event/2 with invalid data returns error changeset" do
@@ -208,7 +208,7 @@ defmodule DerbyLive.RacingTest do
       assert {:ok, %Event{} = event} = Racing.archive_event(event)
       assert event.name == original_event.name
       assert event.status == "archived"
-      assert event.url_prefix == original_event.url_prefix
+      assert event.key == original_event.key
     end
 
     test "delete_event/1 deletes the event" do

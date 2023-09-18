@@ -73,8 +73,8 @@ defmodule DerbyLive.Racing do
 
   def get_event!(id), do: Repo.get!(Event, id)
 
-  def get_event_by_url_prefix(url_prefix) do
-    Repo.get_by(Event, url_prefix: url_prefix)
+  def get_event_by_key(key) do
+    Repo.get_by(Event, key: key)
   end
 
   def create_live_event(attrs \\ %{}) do

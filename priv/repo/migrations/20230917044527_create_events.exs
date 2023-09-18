@@ -4,7 +4,7 @@ defmodule DerbyLive.Repo.Migrations.CreateEvents do
   def change do
     create table(:events) do
       add :name, :string
-      add :url_prefix, :string
+      add :key, :string
       add :status, :string
 
       timestamps()

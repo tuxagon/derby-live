@@ -48,7 +48,7 @@ defmodule DerbyLive.Factory do
     %Event{
       name: Faker.Lorem.sentence(),
       status: "live",
-      url_prefix: Faker.UUID.v4()
+      key: Faker.UUID.v4()
     }
   end
 end
