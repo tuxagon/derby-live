@@ -33,8 +33,8 @@ defmodule DerbyLiveWeb.Router do
     delete "/auth/logout", AuthController, :logout
     get "/auth/verify/:token", AuthController, :verify
 
-    live "/heats", HeatLive
-    live "/racers", RacerLive
+    live "/:event_key/heats", HeatLive.Index
+    live "/:event_key/racers", RacerLive.Index
   end
 
   ## Authentication routes

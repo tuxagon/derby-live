@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Heats</h1>
+      <ul>
+        <%= for {_dom_id, heat} <- @streams.heats do %>
+          <li>
+            <h2>Heat <%= heat.heat_number %></h2>
+            <ul>
+              <%= for lane <- heat.lanes do %>
+                <li>
+                  <%= lane.racer_heat.lane_number %>: (<%= lane.racer_heat.finish_place %>) <%= lane.racer.car_number %> - <%= lane.racer.first_name %> <%= lane.racer.last_name %>
+                </li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

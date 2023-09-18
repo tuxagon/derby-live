@@ -1,0 +1,14 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Racers</h1>
+      <ul>
+        <%= for {_dom_id, racer} <- @streams.racers do %>
+          <li>
+            <%= racer.car_number %> - <%= racer.first_name %> <%= racer.last_name %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>

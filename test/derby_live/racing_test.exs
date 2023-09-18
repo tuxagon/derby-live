@@ -151,7 +151,9 @@ defmodule DerbyLive.RacingTest do
   end
 
   describe "heats" do
-    test "list_heats_for_event/1 returns all heats for an event as map" do
+    alias DerbyLive.Racing.{Lane, Heat}
+
+    test "list_heats_for_event/1 returns all heats for an event" do
       event = insert(:event) |> reload_event
       [racer1, racer2, racer3, racer4] = insert_list(4, :racer, event: event) |> reload_racers
 
@@ -171,14 +173,17 @@ defmodule DerbyLive.RacingTest do
         insert(:racer_heat, racer_id: racer4.racer_id, heat_number: 1, event: event)
         |> reload_racer_heat
 
-      assert Racing.list_heats_for_event(event) == %{
-               1 => [
-                 {racer1, racer_heat1},
-                 {racer2, racer_heat2},
-                 {racer3, racer_heat3},
-                 {racer4, racer_heat4}
-               ]
-             }
+      assert Racing.list_heats_for_event(event) == [
+               %Heat{
+                 heat_number: 1,
+                 lanes: [
+                   %Lane{racer: racer1, racer_heat: racer_heat1},
+                   %Lane{racer: racer2, racer_heat: racer_heat2},
+                   %Lane{racer: racer3, racer_heat: racer_heat3},
+                   %Lane{racer: racer4, racer_heat: racer_heat4}
+                 ]
+               }
+             ]
     end
   end
 

@@ -14,7 +14,7 @@
 >
   <:col :let={{_id, event}} label="Name"><%= event.name %></:col>
   <:col :let={{_id, event}} label="Url prefix">
-    <%= event.key %>
+    <.link navigate={~p"/#{event.key}/heats"}><%= event.key %></.link>
   </:col>
   <:col :let={{_id, event}} label="Status"><%= event.status %></:col>
   <:action :let={{_id, event}}>

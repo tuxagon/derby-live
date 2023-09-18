@@ -2,7 +2,8 @@ alias DerbyLive.Repo
 
 alias DerbyLive.Account
 alias DerbyLive.Account.User
-alias DerbyLive.Racing.{Racer, RacerHeat}
+alias DerbyLive.Racing
+alias DerbyLive.Racing.{Event, Racer, RacerHeat}
 
 IEx.configure(
   inspect: [limit: :infinity, pretty: true],

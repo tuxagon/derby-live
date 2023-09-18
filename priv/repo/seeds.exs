@@ -5,9 +5,11 @@
 
 alias DerbyLive.Account.User
 alias DerbyLive.Repo
+alias DerbyLive.Racing.Event
 alias DerbyLive.Racing.Racer
 alias DerbyLive.Racing.RacerHeat
 
+Repo.delete_all(Event)
 Repo.delete_all(User)
 Repo.delete_all(Racer)
 Repo.delete_all(RacerHeat)
@@ -20,7 +22,15 @@ user = %User{
   api_key: "XAkUz3S6e8Kcae6Ks14QYmIMD9aZUtT4G3azdOyuOn8bGhyiHc1W4yGhw42KfKcV"
 }
 
-Repo.insert!(user)
+user = Repo.insert!(user)
+
+event = %DerbyLive.Racing.Event{
+  name: "Demo Event",
+  key: "demo",
+  user_id: user.id
+}
+
+event = Repo.insert!(event)
 
 num_racers = 24
 num_lanes = 4
@@ -45,7 +55,8 @@ ranks = ["Lions", "Tigers", "Wolves", "Bears", "Webelos", "Arrow of Light"]
     last_name: last_name,
     rank: rank,
     car_name: car_name,
-    car_number: car_number + 100
+    car_number: car_number + 100,
+    event_id: event.id
   }
 
   Repo.insert!(racer)
@@ -81,7 +92,8 @@ first_heats
       car_number: racer.car_number,
       finish_seconds: Enum.at(finishes, place - 1),
       finish_place: place,
-      finished_at: NaiveDateTime.local_now()
+      finished_at: NaiveDateTime.local_now(),
+      event_id: event.id
     }
   end)
   |> Enum.each(&Repo.insert!/1)

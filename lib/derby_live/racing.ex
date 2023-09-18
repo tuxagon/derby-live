@@ -2,6 +2,8 @@ defmodule DerbyLive.Racing do
   import Ecto.Query
 
   alias DerbyLive.Repo
+  alias DerbyLive.Racing.Heat
+  alias DerbyLive.Racing.Lane
   alias DerbyLive.Racing.Racer
 
   def list_racers() do
@@ -82,6 +84,12 @@ defmodule DerbyLive.Racing do
     )
     |> Repo.all()
     |> Enum.group_by(fn {_r, rh} -> rh.heat_number end)
+    |> Enum.map(fn {heat_number, lanes} ->
+      %Heat{
+        heat_number: heat_number,
+        lanes: Enum.map(lanes, fn {r, rh} -> %Lane{racer: r, racer_heat: rh} end)
+      }
+    end)
   end
 
   alias DerbyLive.Racing.Event

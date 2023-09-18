@@ -9,11 +9,13 @@ defmodule DerbyLiveWeb.DataControllerTest do
 
   test "POST /api/data for racers", %{conn: conn} do
     user = insert(:user)
+    event = insert(:event, user: user)
 
     conn =
       conn
       |> put_req_header("x-api-key", user.api_key)
       |> post("/api/data", %{
+        "event_key" => event.key,
         "racers" => [
           %{
             "racer_id" => 1,
@@ -32,11 +34,13 @@ defmodule DerbyLiveWeb.DataControllerTest do
 
   test "POST /api/data for racer_heats", %{conn: conn} do
     user = insert(:user)
+    event = insert(:event, user: user)
 
     conn =
       conn
       |> put_req_header("x-api-key", user.api_key)
       |> post("/api/data", %{
+        "event_key" => event.key,
         "racer_heats" => [
           %{
             "racer_id" => 1,
@@ -52,5 +56,29 @@ defmodule DerbyLiveWeb.DataControllerTest do
       })
 
     assert json_response(conn, 200) == %{"status" => "ok"}
+  end
+
+  test "POST /api/data for invalid event key", %{conn: conn} do
+    user = insert(:user)
+
+    conn =
+      conn
+      |> put_req_header("x-api-key", user.api_key)
+      |> post("/api/data", %{
+        "event_key" => "invalid",
+        "racers" => [
+          %{
+            "racer_id" => 1,
+            "first_name" => "John",
+            "last_name" => "Doe",
+            "rank" => "Tigers",
+            "group" => "Cubs",
+            "car_name" => "The Tiger",
+            "car_number" => 101
+          }
+        ]
+      })
+
+    assert json_response(conn, 200) == %{"status" => "errror", "message" => "Invalid event key"}
   end
 end
