@@ -2,6 +2,7 @@ defmodule DerbyLive.Factory do
   use ExMachina.Ecto, repo: DerbyLive.Repo
 
   alias DerbyLive.Account.User
+  alias DerbyLive.Racing.Event
   alias DerbyLive.Racing.Racer
   alias DerbyLive.Racing.RacerHeat
 
@@ -40,6 +41,14 @@ defmodule DerbyLive.Factory do
       auth_token: Faker.UUID.v4(),
       auth_token_expires_at:
         DateTime.utc_now() |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
+    }
+  end
+
+  def event_factory do
+    %Event{
+      name: Faker.Lorem.sentence(),
+      status: "live",
+      url_prefix: Faker.UUID.v4()
     }
   end
 end

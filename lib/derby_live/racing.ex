@@ -3,7 +3,6 @@ defmodule DerbyLive.Racing do
 
   alias DerbyLive.Repo
   alias DerbyLive.Racing.Racer
-  alias DerbyLive.Racing.RacerHeat
 
   def list_racers do
     Repo.all(Racer)
@@ -28,6 +27,8 @@ defmodule DerbyLive.Racing do
   def delete_racer(racer) do
     Repo.delete(racer)
   end
+
+  alias DerbyLive.Racing.RacerHeat
 
   def list_racer_heats do
     Repo.all(RacerHeat)
@@ -62,5 +63,44 @@ defmodule DerbyLive.Racing do
     )
     |> Repo.all()
     |> Enum.group_by(fn {_r, rh} -> rh.heat_number end)
+  end
+
+  alias DerbyLive.Racing.Event
+
+  def list_events do
+    Repo.all(Event)
+  end
+
+  def get_event!(id), do: Repo.get!(Event, id)
+
+  def get_event_by_url_prefix(url_prefix) do
+    Repo.get_by(Event, url_prefix: url_prefix)
+  end
+
+  def create_live_event(attrs \\ %{}) do
+    %Event{}
+    |> Event.live_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_event(%Event{} = event, attrs) do
+    event
+    |> Event.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def archive_event(%Event{} = event) do
+    event
+    |> Event.archived_changeset()
+    |> Repo.update()
+  end
+
+  def delete_event(%Event{} = event) do
+    Repo.delete(event)
+  end
+
+  def change_event(%Event{} = event, attrs \\ %{}) do
+    event
+    |> Event.update_changeset(attrs)
   end
 end

@@ -44,8 +44,12 @@ defmodule DerbyLiveWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{DerbyLiveWeb.UserAuth, :ensure_authenticated}] do
-      live "/events", EventLive, :index
-      live "/events/new", EventLive, :new
+      live "/events", EventLive.Index, :index
+      live "/events/new", EventLive.Index, :new
+      live "/events/:id/edit", EventLive.Index, :edit
+
+      live "/events/:id", EventLive.Show, :show
+      live "/events/:id/show/edit", EventLive.Show, :edit
     end
   end
 
