@@ -1,9 +1,12 @@
 <script lang="ts">
-  import Greet from './lib/Greet.svelte'
+  import Greet from "./lib/Greet.svelte";
+  import DatabasePicker from "./lib/DatabasePicker.svelte";
 </script>
 
 <main class="container">
   <h1>Welcome to Tauri!</h1>
+
+  <DatabasePicker />
 
   <div class="row">
     <a href="https://vitejs.dev" target="_blank">
@@ -17,15 +20,11 @@
     </a>
   </div>
 
-  <p>
-    Click on the Tauri, Vite, and Svelte logos to learn more.
-  </p>
+  <p>Click on the Tauri, Vite, and Svelte logos to learn more.</p>
 
   <div class="row">
     <Greet />
   </div>
-
-
 </main>
 
 <style>
