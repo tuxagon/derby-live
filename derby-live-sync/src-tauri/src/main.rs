@@ -125,6 +125,16 @@ fn fetch_database_path(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Str
         .unwrap_or_default()
 }
 
+#[tauri::command]
+async fn start_sync(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Result<(), ()> {
+    Ok(())
+}
+
+#[tauri::command]
+async fn stop_sync(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Result<(), ()> {
+    Ok(())
+}
+
 #[derive(serde::Serialize, serde::Deserialize)]
 struct SavedSettings {
     api_key: String,

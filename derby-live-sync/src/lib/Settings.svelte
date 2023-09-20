@@ -8,7 +8,6 @@
   onMount(() => {
     console.log("onMount Settings");
     invoke("fetch_settings").then((settings) => {
-      console.log("Settings", settings);
       apiKey.set(settings.apiKey as string);
       eventKey.set(settings.eventKey as string);
     });
