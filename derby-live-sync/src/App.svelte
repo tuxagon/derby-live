@@ -1,12 +1,17 @@
 <script lang="ts">
   import Greet from "./lib/Greet.svelte";
   import DatabasePicker from "./lib/DatabasePicker.svelte";
+  import Topbar from "./lib/Topbar.svelte";
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri!</h1>
+<main class="px-4">
+  <Topbar />
 
-  <DatabasePicker />
+  <h1>Derby Live Sync</h1>
+
+  <div class="container">
+    <DatabasePicker />
+  </div>
 
   <div class="row">
     <a href="https://vitejs.dev" target="_blank">
@@ -28,6 +33,14 @@
 </main>
 
 <style>
+  h1 {
+    @apply text-4xl font-bold text-orange-600 py-2 border-b-2 border-orange-600 border-solid;
+  }
+
+  .container {
+    @apply m-0 pt-6 flex flex-col justify-center items-center;
+  }
+
   .logo.vite:hover {
     filter: drop-shadow(0 0 2em #747bff);
   }
