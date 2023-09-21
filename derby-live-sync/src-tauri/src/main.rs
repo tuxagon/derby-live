@@ -7,12 +7,13 @@ use std::{
     path::PathBuf,
     sync::{Arc, Mutex},
 };
-use tauri::{api, Manager};
+use tauri::Manager;
 
-pub struct AppState {
+struct AppState {
     database_path: Option<PathBuf>,
     api_key: Option<String>,
     event_key: Option<String>,
+    synchronizer: Option<sync::Synchronizer>,
 }
 
 impl Default for AppState {
@@ -21,6 +22,7 @@ impl Default for AppState {
             database_path: Default::default(),
             api_key: Default::default(),
             event_key: Default::default(),
+            synchronizer: Default::default(),
         }
     }
 }
@@ -126,12 +128,42 @@ fn fetch_database_path(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Str
 }
 
 #[tauri::command]
-async fn start_sync(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Result<(), ()> {
+async fn start_sync(
+    app_handle: tauri::AppHandle,
+    app_state: tauri::State<'_, Arc<Mutex<AppState>>>,
+) -> Result<(), ()> {
+    let state = Arc::clone(&app_state);
+    {
+        let mut state_locked = state.lock().unwrap();
+        let database_path = state_locked.database_path.clone().unwrap_or_default();
+        state_locked.synchronizer =
+            Some(sync::Synchronizer::new(database_path, app_handle.clone()));
+    }
+
+    if let Some(synchronizer) = &state.lock().unwrap().synchronizer {
+        synchronizer.start();
+        app_handle
+            .emit_all("sync_started", ())
+            .expect("failed to emit event");
+    }
+
     Ok(())
 }
 
 #[tauri::command]
-async fn stop_sync(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Result<(), ()> {
+async fn stop_sync(
+    app_handle: tauri::AppHandle,
+    app_state: tauri::State<'_, Arc<Mutex<AppState>>>,
+) -> Result<(), ()> {
+    let state_locked = app_state.lock().unwrap();
+
+    if let Some(synchronizer) = &state_locked.synchronizer {
+        synchronizer.stop();
+        app_handle
+            .emit_all("sync_stopped", ())
+            .expect("failed to emit event");
+    }
+
     Ok(())
 }
 
@@ -201,7 +233,9 @@ fn main() {
             open_database,
             save_settings,
             fetch_settings,
-            fetch_database_path
+            fetch_database_path,
+            start_sync,
+            stop_sync
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

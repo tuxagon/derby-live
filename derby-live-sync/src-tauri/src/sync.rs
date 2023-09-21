@@ -1,6 +1,79 @@
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use rusqlite::{params, Connection};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
-use std::path::PathBuf;
+use std::{
+    path::PathBuf,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    time::Duration,
+};
+use tauri::{AppHandle, Manager};
+
+pub struct Synchronizer {
+    running: Arc<AtomicBool>,
+    watched_path: Option<PathBuf>,
+    app_handle: Arc<AppHandle>,
+}
+
+impl Synchronizer {
+    pub fn new(path: PathBuf, app_handle: AppHandle) -> Synchronizer {
+        Synchronizer {
+            watched_path: Some(path),
+            running: Arc::new(AtomicBool::new(false)),
+            app_handle: Arc::new(app_handle),
+        }
+    }
+
+    pub fn is_running(&self) -> bool {
+        self.running.load(Ordering::Relaxed)
+    }
+
+    pub fn start(&self) {
+        if self.is_running() {
+            return;
+        }
+
+        if let Some(path) = &self.watched_path {
+            if !path.exists() {
+                return;
+            }
+
+            self.running.store(true, Ordering::Relaxed);
+
+            let running_clone = self.running.clone();
+            let watched_path_clone = self.watched_path.clone().unwrap();
+            let app_handle_clone = self.app_handle.clone();
+
+            std::thread::spawn(move || {
+                let (tx, rx) = std::sync::mpsc::channel();
+
+                let mut watcher = RecommendedWatcher::new(tx, Config::default()).unwrap();
+                watcher
+                    .watch(&watched_path_clone, RecursiveMode::NonRecursive)
+                    .unwrap();
+
+                while running_clone.load(Ordering::Relaxed) {
+                    match rx.recv_timeout(Duration::from_secs(1)) {
+                        Ok(event) => {
+                            let message = format!("{:?}", event);
+                            app_handle_clone
+                                .emit_all("file_changed", message)
+                                .expect("failed to emit event");
+                            println!("watch_event: {:?}", event)
+                        }
+                        Err(e) => println!("watch_error: {:?}", e),
+                    }
+                }
+            });
+        }
+    }
+
+    pub fn stop(&self) {
+        self.running.store(false, Ordering::Relaxed);
+    }
+}
 
 struct DatabaseConnector {
     conn: Connection,

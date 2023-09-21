@@ -4,14 +4,21 @@
   import { listen } from "@tauri-apps/api/event";
 
   let isSyncRunning = false;
-  let logs: string[] = ["Uploading racers", "Uploading racer heats"];
+  let logs: string[] = [];
 
-  const unlisten = listen("sync_stopped", (event) => {
+  const unlistenStart = listen("sync_started", (event) => {
+    isSyncRunning = true;
+  });
+
+  const unlistenStop = listen("sync_stopped", (event) => {
     isSyncRunning = false;
   });
 
+  const unlistenLog = listen("file_changed", (event) => {
+    logs = [...logs, event.payload as string];
+  });
+
   async function startSync() {
-    isSyncRunning = true;
     await invoke("start_sync");
   }
 
@@ -26,11 +33,17 @@
     <button disabled={!isSyncRunning} on:click={stopSync}>Stop Sync </button>
   </div>
   <div class="sync-log">
-    {#each logs as log}
-      <div class="log-entry">
-        <SyncLog {log} />
-      </div>
-    {/each}
+    {#if logs.length === 0}
+      <p class="self-center p-2 text-orange-600 font-bold">
+        Click "Start Sync" to get logs
+      </p>
+    {:else}
+      {#each logs as log}
+        <div class="log-entry">
+          <SyncLog {log} />
+        </div>
+      {/each}
+    {/if}
   </div>
 </section>
 
