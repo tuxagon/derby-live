@@ -113,7 +113,6 @@ pub enum SyncError {
     DatabaseError(rusqlite::Error),
     UploadError(reqwest::Error),
     NotifyError(notify::Error),
-    TauriError(tauri::Error),
 }
 
 impl fmt::Display for SyncError {
@@ -122,7 +121,6 @@ impl fmt::Display for SyncError {
             SyncError::DatabaseError(e) => write!(f, "DatabaseError: {}", e),
             SyncError::UploadError(e) => write!(f, "UploadError: {}", e),
             SyncError::NotifyError(e) => write!(f, "NotifyError: {}", e),
-            SyncError::TauriError(e) => write!(f, "TauriError: {}", e),
         }
     }
 }
@@ -244,32 +242,6 @@ impl Synchronizer {
             }
         });
 
-        // let watcher = Arc::clone(&self.watcher);
-        // let mut watcher_locked = watcher.lock().unwrap();
-
-        // if watcher_locked.is_none() {
-        //     let mut new_watcher = PollWatcher::with_initial_scan(
-        //         move |watch_event| {
-        //             std_tx_clone
-        //                 .send(SyncMessage::SyncEvent(watch_event))
-        //                 .unwrap();
-        //         },
-        //         Synchronizer::watcher_config(),
-        //         move |scan_event| {
-        //             std_tx.send(SyncMessage::SyncScan(scan_event)).unwrap();
-        //         },
-        //     )
-        //     .map_err(|e| SyncError::NotifyError(e))?;
-
-        //     if let Some(path) = &sync_state_clone.watched_path {
-        //         new_watcher
-        //             .watch(path.as_ref(), RecursiveMode::NonRecursive)
-        //             .map_err(|e| SyncError::NotifyError(e))?;
-        //     }
-
-        //     *watcher_locked = Some(new_watcher);
-        // }
-
         Ok(())
     }
 
@@ -322,79 +294,6 @@ impl Synchronizer {
     fn set_running(&self, running: bool) {
         self.running.store(running, Ordering::Relaxed);
     }
-
-    // pub async fn start_(&self) -> Result<(), tauri::Error> {
-    //     println!("start_sync");
-    //     if self.is_running() {
-    //         return Ok(());
-    //     }
-
-    //     self.running.store(true, Ordering::Relaxed);
-
-    //     let running_clone1 = self.running.clone();
-    //     let running_clone2 = self.running.clone();
-    //     let sync_state_clone = self.sync_state.clone();
-
-    //     // Standard channel for notify
-    //     let (std_tx, std_rx) = std::sync::mpsc::channel::<Result<notify::Event, notify::Error>>();
-    //     // Async channel for sync
-    //     let (async_tx, mut async_rx) =
-    //         tokio::sync::mpsc::channel::<Result<notify::Event, notify::Error>>(32);
-
-    //     // Start watching and add the watcher to self for broader lifetime
-    //     let watcher = Arc::clone(&self.watcher);
-    //     let mut watcher_locked = watcher.lock().unwrap();
-    //     if watcher_locked.is_none() {
-    //         let mut new_watcher = RecommendedWatcher::new(std_tx, Config::default()).unwrap();
-
-    //         if let Some(path) = &sync_state_clone.watched_path {
-    //             new_watcher
-    //                 .watch(&path, RecursiveMode::NonRecursive)
-    //                 .unwrap();
-    //         }
-
-    //         *watcher_locked = Some(new_watcher);
-    //     }
-
-    //     Synchronizer::emit_sync_started(&sync_state_clone);
-
-    //     // Spawn a thread to bridge the std library channel to the async channel
-    //     std::thread::spawn(move || loop {
-    //         while running_clone1.load(Ordering::Relaxed) {
-    //             match std_rx.recv_timeout(Duration::from_secs(1)) {
-    //                 Ok(event) => {
-    //                     let _ = async_tx.blocking_send(event);
-    //                 }
-    //                 Err(e) => {
-    //                     println!("std_rx error: {:?}", e);
-    //                 }
-    //             }
-    //         }
-    //     });
-
-    //     if let Some(path) = &sync_state_clone.watched_path {
-    //         if !path.exists() {
-    //             running_clone2.store(false, Ordering::Relaxed);
-    //             Synchronizer::emit_sync_error(
-    //                 &sync_state_clone,
-    //                 format!("Path does not exist: {:?}", path),
-    //             );
-    //             return Ok(());
-    //         }
-
-    //         tauri::async_runtime::spawn(async move {
-    //             while running_clone2.load(Ordering::Relaxed) {
-    //                 if let Some(Ok(event)) = async_rx.recv().await {
-    //                     println!("Received on async_rx: {:?}", event);
-
-    //                     let _ = Synchronizer::do_sync(&sync_state_clone).await;
-    //                 }
-    //             }
-    //         });
-    //     }
-
-    //     Ok(())
-    // }
 }
 
 impl DatabaseConnector {
@@ -511,13 +410,13 @@ impl Uploader {
         racers: Vec<Racer>,
         racer_heats: Vec<RacerHeat>,
     ) -> Result<(), SyncError> {
-        info!(target: "sync", "upload");
         let client = reqwest::Client::new();
         let request_data = RequestData {
             event_key: self.event_key.clone(),
             racers,
             racer_heats,
         };
+        info!(target: "sync", "upload: event_key:{:?}, server_url:{:?}, api_key:{:?}", self.event_key, self.server_url, self.api_key);
 
         let url = format!("{}/api/data", self.server_url);
 
