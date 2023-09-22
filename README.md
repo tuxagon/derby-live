@@ -8,6 +8,10 @@ This app is a live front end for [Gran Prix Race Manager](https://grandprix-soft
 SENDGRID_API_KEY=
 ```
 
+## Dev notes
+
+- `fswatch -o tmp/example.sqlite | xargs -n1 -I{} ruby -e 'puts "changed @ #{Time.now}"'` was not triggering a change for unknown reasons. To get it working, add `-m poll_monitor` to the command, like `fswatch -m poll_monitor -o tmp/example.sqlite | xargs -n1 -I{} ruby -e 'puts "changed @ #{Time.now}"'`.
+
 ## Dev Notes about Gran Prix Race Manager
 
 SQLite is used for the database and here are some relevant queries.
