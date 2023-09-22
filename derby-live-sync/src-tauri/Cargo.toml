@@ -9,6 +9,9 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[env]
+DERBY_LIVE_API_URL = "http://localhost:4000"
+
 [build-dependencies]
 tauri-build = { version = "1.4", features = [] }
 
@@ -20,6 +23,8 @@ thiserror = "1.0"
 rusqlite = "0.29.0"
 reqwest = { version = "0.11", features = ["json"] }
 notify = "6.1.1"
+tokio = { version = "1.32.0", features = ["full"] }
+log = { version = "0.4.20", features = ["max_level_debug", "release_max_level_warn"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

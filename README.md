@@ -32,7 +32,7 @@ For grabbing racer_heats and times
 SELECT
   ri.CarNumber as 'car_number',
   ri.RacerID as 'racer_id',
-  rc.RacerHeat as 'racer_heat_number',
+  rc.Heat as 'racer_heat_number',
   rc.FinishTime as 'finish_seconds',
   rc.FinishPlace as 'finish_place',
   c.Class as 'group',

@@ -25,7 +25,7 @@
       unlisten;
     });
 
-    invoke("open_database");
+    invoke("choose_database");
   }
 </script>
 

@@ -45,9 +45,9 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "derby-live-sync",
+        "title": "Derby Live Sync",
         "width": 800,
-        "height": 600
+        "height": 850
       }
     ]
   }

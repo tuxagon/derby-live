@@ -1,15 +1,16 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { apiKey, eventKey } from "./stores";
+  import { apiKey, eventKey, serverUrl } from "./stores";
   import { invoke } from "@tauri-apps/api/tauri";
 
   export let settingsOpen: boolean = true;
 
   onMount(() => {
     console.log("onMount Settings");
-    invoke("fetch_settings").then((settings) => {
+    invoke("fetch_app_settings").then((settings) => {
       apiKey.set(settings.apiKey as string);
       eventKey.set(settings.eventKey as string);
+      serverUrl.set(settings.serverUrl as string);
     });
 
     return () => {};
@@ -19,12 +20,16 @@
 
   let inputApiKey = "";
   let inputEventKey = "";
+  let currentServerUrl = "";
 
   apiKey.subscribe((key) => {
     inputApiKey = key;
   });
   eventKey.subscribe((key) => {
     inputEventKey = key;
+  });
+  serverUrl.subscribe((url) => {
+    currentServerUrl = url;
   });
 
   async function save() {
@@ -39,6 +44,7 @@
 </script>
 
 <div>
+  <p>{currentServerUrl}</p>
   <form class="flex flex-row flex-wrap" on:submit|preventDefault={save}>
     <input
       id="api-key-input"

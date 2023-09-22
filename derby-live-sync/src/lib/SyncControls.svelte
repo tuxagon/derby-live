@@ -8,13 +8,19 @@
 
   const unlistenStart = listen("sync_started", (event) => {
     isSyncRunning = true;
+    logs = [...logs, "Sync started"];
   });
 
   const unlistenStop = listen("sync_stopped", (event) => {
     isSyncRunning = false;
+    logs = [...logs, "Sync stopped"];
   });
 
-  const unlistenLog = listen("file_changed", (event) => {
+  const unlistenLog = listen("sync_updated", async (event) => {
+    logs = [...logs, event.payload as string];
+  });
+
+  const unlistenErr = listen("sync_error", async (event) => {
     logs = [...logs, event.payload as string];
   });
 
@@ -66,6 +72,6 @@
   }
 
   .sync-log {
-    @apply m-0 mt-8 px-4 flex flex-col justify-items-start;
+    @apply m-0 mt-8 px-4 flex flex-col justify-items-start overflow-y-scroll h-96;
   }
 </style>
