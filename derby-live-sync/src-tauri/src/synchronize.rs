@@ -87,13 +87,13 @@ struct Racer {
 struct RacerHeat {
     car_number: i32,
     racer_id: i32,
-    racer_heat_number: i32,
+    heat_number: i32,
     finish_seconds: Option<f64>,
     finish_place: Option<i32>,
     group: String,
-    rank: String,
     lane_number: i32,
-    finished_at: Option<String>,
+    finished_at_unix: Option<i64>,
+    result_id: i32,
 }
 
 #[derive(Debug, Serialize)]
@@ -208,6 +208,11 @@ impl Synchronizer {
         let sync_state_clone = self.sync_state.clone();
         let std_running_clone = self.running.clone();
         let async_running_clone = self.running.clone();
+
+        let sync_state_clone_for_initial_sync = self.sync_state.clone();
+        tauri::async_runtime::spawn(async move {
+            let _ = Synchronizer::run_sync(&sync_state_clone_for_initial_sync).await;
+        });
 
         // Start watching and add the watcher to self for broader lifetime
         self.try_create_watcher(std_tx)?;
@@ -357,13 +362,13 @@ impl DatabaseConnector {
                 "SELECT
                   ri.CarNumber as 'car_number',
                   ri.RacerID as 'racer_id',
-                  rc.Heat as 'racer_heat_number',
+                  rc.Heat as 'heat_number',
                   rc.FinishTime as 'finish_seconds',
                   rc.FinishPlace as 'finish_place',
                   c.Class as 'group',
-                  rk.Rank as 'rank',
                   rc.Lane as 'lane_number',
-                  rc.Completed as 'finished_at'
+                  STRFTIME('%s', rc.Completed) as 'finished_at_unix'
+                  ri.ResultID as 'result_id',
                 FROM RaceChart rc
                 INNER JOIN RegistrationInfo ri ON rc.RacerID = ri.RacerID
                 INNER JOIN Classes c ON c.ClassID = rc.ClassID
@@ -376,13 +381,13 @@ impl DatabaseConnector {
                 Ok(RacerHeat {
                     car_number: row.get(0)?,
                     racer_id: row.get(1)?,
-                    racer_heat_number: row.get(2)?,
+                    heat_number: row.get(2)?,
                     finish_seconds: row.get(3)?,
                     finish_place: row.get(4)?,
                     group: row.get(5)?,
-                    rank: row.get(6)?,
                     lane_number: row.get(7)?,
-                    finished_at: row.get(8)?,
+                    finished_at_unix: row.get(8)?,
+                    result_id: row.get(9)?,
                 })
             })
             .map_err(|e| SyncError::DatabaseError(e))?;

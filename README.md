@@ -36,13 +36,12 @@ For grabbing racer_heats and times
 SELECT
   ri.CarNumber as 'car_number',
   ri.RacerID as 'racer_id',
-  rc.Heat as 'racer_heat_number',
+  rc.Heat as 'heat_number',
   rc.FinishTime as 'finish_seconds',
   rc.FinishPlace as 'finish_place',
   c.Class as 'group',
-  rk.Rank as 'rank',
   rc.Lane as 'lane_number',
-  rc.Completed as 'finished_at'
+  STRFTIME('%s', rc.Completed) as 'finished_at_unix'
 FROM RaceChart rc
 INNER JOIN RegistrationInfo ri ON rc.RacerID = ri.RacerID
 INNER JOIN Classes c ON c.ClassID = rc.ClassID
