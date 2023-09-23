@@ -18,6 +18,7 @@ defmodule DerbyLiveWeb.DataController do
   end
 
   def import_racers(%{"racers" => racers}, event), do: Importer.import_racers(racers, event)
+
   def import_racers(_params, _event), do: nil
 
   def import_racer_heats(%{"racer_heats" => racer_heats}, event),

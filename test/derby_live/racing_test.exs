@@ -18,9 +18,35 @@ defmodule DerbyLive.RacingTest do
 
   def reload_racer_heat(racer_heat), do: RacerHeat |> Repo.get(racer_heat.id)
 
-  describe "racers" do
-    alias DerbyLive.Racing.Racer
+  def racer_to_map(%Racer{} = racer) do
+    %{
+      racer_id: racer.racer_id,
+      first_name: racer.first_name,
+      last_name: racer.last_name,
+      rank: racer.rank,
+      group: racer.group,
+      car_name: racer.car_name,
+      car_number: racer.car_number,
+      event_id: racer.event_id
+    }
+  end
 
+  def racer_heat_to_map(%RacerHeat{} = racer_heat) do
+    %{
+      result_id: racer_heat.result_id,
+      car_number: racer_heat.car_number,
+      finish_place: racer_heat.finish_place,
+      finish_seconds: racer_heat.finish_seconds,
+      finished_at: racer_heat.finished_at,
+      group: racer_heat.group,
+      lane_number: racer_heat.lane_number,
+      racer_id: racer_heat.racer_id,
+      heat_number: racer_heat.heat_number,
+      event_id: racer_heat.event_id
+    }
+  end
+
+  describe "racers" do
     test "list_racers/0 returns all racers" do
       racer = insert(:racer) |> reload_racer
       assert Racing.list_racers() == [racer]
@@ -41,14 +67,17 @@ defmodule DerbyLive.RacingTest do
       event = insert(:event)
       attrs = params_for(:racer, event_id: event.id)
       {:ok, racer} = Racing.create_racer(attrs)
-      assert racer.racer_id == attrs[:racer_id]
-      assert racer.first_name == attrs[:first_name]
-      assert racer.last_name == attrs[:last_name]
-      assert racer.rank == attrs[:rank]
-      assert racer.group == attrs[:group]
-      assert racer.car_name == attrs[:car_name]
-      assert racer.car_number == attrs[:car_number]
-      assert racer.event_id == event.id
+
+      assert racer_to_map(racer) == %{
+               racer_id: attrs[:racer_id],
+               first_name: attrs[:first_name],
+               last_name: attrs[:last_name],
+               rank: attrs[:rank],
+               group: attrs[:group],
+               car_name: attrs[:car_name],
+               car_number: attrs[:car_number],
+               event_id: event.id
+             }
     end
 
     test "update_racer/2 updates racer" do
@@ -65,14 +94,74 @@ defmodule DerbyLive.RacingTest do
       }
 
       {:ok, racer} = Racing.update_racer(racer, attrs)
-      assert racer.racer_id == attrs[:racer_id]
-      assert racer.first_name == attrs[:first_name]
-      assert racer.last_name == attrs[:last_name]
-      assert racer.rank == attrs[:rank]
-      assert racer.group == attrs[:group]
-      assert racer.car_name == attrs[:car_name]
-      assert racer.car_number == attrs[:car_number]
-      assert racer.event_id == racer.event_id
+
+      assert racer_to_map(racer) == %{
+               racer_id: attrs[:racer_id],
+               first_name: attrs[:first_name],
+               last_name: attrs[:last_name],
+               rank: attrs[:rank],
+               group: attrs[:group],
+               car_name: attrs[:car_name],
+               car_number: attrs[:car_number],
+               event_id: racer.event_id
+             }
+    end
+
+    test "update_or_create_racer/1 updates racer if it exists" do
+      event = insert(:event)
+      racer = insert(:racer, event: event)
+
+      attrs = %{
+        racer_id: racer.racer_id,
+        first_name: "John",
+        last_name: "Doe",
+        rank: "Tigers",
+        group: "Cubs",
+        car_name: "The Tiger",
+        car_number: 1,
+        event_id: event.id
+      }
+
+      {:ok, racer} = Racing.update_or_create_racer(attrs)
+
+      assert racer_to_map(racer) == %{
+               racer_id: attrs[:racer_id],
+               first_name: attrs[:first_name],
+               last_name: attrs[:last_name],
+               rank: attrs[:rank],
+               group: attrs[:group],
+               car_name: attrs[:car_name],
+               car_number: attrs[:car_number],
+               event_id: event.id
+             }
+    end
+
+    test "update_or_create_racer/1 creates racer if it does not exist" do
+      event = insert(:event)
+
+      attrs = %{
+        racer_id: 1,
+        first_name: "John",
+        last_name: "Doe",
+        rank: "Tigers",
+        group: "Cubs",
+        car_name: "The Tiger",
+        car_number: 1,
+        event_id: event.id
+      }
+
+      {:ok, racer} = Racing.update_or_create_racer(attrs)
+
+      assert racer_to_map(racer) == %{
+               racer_id: attrs[:racer_id],
+               first_name: attrs[:first_name],
+               last_name: attrs[:last_name],
+               rank: attrs[:rank],
+               group: attrs[:group],
+               car_name: attrs[:car_name],
+               car_number: attrs[:car_number],
+               event_id: event.id
+             }
     end
 
     test "delete_racer/1 deletes racer" do
@@ -83,8 +172,6 @@ defmodule DerbyLive.RacingTest do
   end
 
   describe "racer_heats" do
-    alias DerbyLive.Racing.RacerHeat
-
     test "list_racer_heats/0 returns all racer_heats" do
       racer_heat = insert(:racer_heat) |> reload_racer_heat
       assert Racing.list_racer_heats() == [racer_heat]
@@ -105,15 +192,19 @@ defmodule DerbyLive.RacingTest do
       event = insert(:event)
       attrs = params_for(:racer_heat, event_id: event.id)
       {:ok, racer_heat} = Racing.create_racer_heat(attrs)
-      assert racer_heat.group == attrs[:group]
-      assert racer_heat.racer_id == attrs[:racer_id]
-      assert racer_heat.heat_number == attrs[:heat_number]
-      assert racer_heat.lane_number == attrs[:lane_number]
-      assert racer_heat.car_number == attrs[:car_number]
-      assert racer_heat.finish_seconds == attrs[:finish_seconds]
-      assert racer_heat.finish_place == attrs[:finish_place]
-      assert racer_heat.finished_at == attrs[:finished_at]
-      assert racer_heat.event_id == event.id
+
+      assert racer_heat_to_map(racer_heat) == %{
+               result_id: attrs[:result_id],
+               group: attrs[:group],
+               racer_id: attrs[:racer_id],
+               heat_number: attrs[:heat_number],
+               lane_number: attrs[:lane_number],
+               car_number: attrs[:car_number],
+               finish_seconds: attrs[:finish_seconds],
+               finish_place: attrs[:finish_place],
+               finished_at: attrs[:finished_at],
+               event_id: event.id
+             }
     end
 
     test "update_racer_heat/2 updates racer_heat" do
@@ -121,6 +212,7 @@ defmodule DerbyLive.RacingTest do
       racer_heat = insert(:racer_heat, event: event)
 
       attrs = %{
+        result_id: 1,
         group: "Cubs",
         racer_id: 1,
         heat_number: 1,
@@ -132,15 +224,84 @@ defmodule DerbyLive.RacingTest do
       }
 
       {:ok, racer_heat} = Racing.update_racer_heat(racer_heat, attrs)
-      assert racer_heat.group == attrs[:group]
-      assert racer_heat.racer_id == attrs[:racer_id]
-      assert racer_heat.heat_number == attrs[:heat_number]
-      assert racer_heat.lane_number == attrs[:lane_number]
-      assert racer_heat.car_number == attrs[:car_number]
-      assert racer_heat.finish_seconds == attrs[:finish_seconds]
-      assert racer_heat.finish_place == attrs[:finish_place]
-      assert racer_heat.finished_at == attrs[:finished_at]
-      assert racer_heat.event_id == event.id
+
+      assert racer_heat_to_map(racer_heat) == %{
+               result_id: attrs[:result_id],
+               group: attrs[:group],
+               racer_id: attrs[:racer_id],
+               heat_number: attrs[:heat_number],
+               lane_number: attrs[:lane_number],
+               car_number: attrs[:car_number],
+               finish_seconds: attrs[:finish_seconds],
+               finish_place: attrs[:finish_place],
+               finished_at: attrs[:finished_at],
+               event_id: event.id
+             }
+    end
+
+    test "update_or_create_racer_heat/1 updates racer_heat if it exists" do
+      event = insert(:event)
+      racer_heat = insert(:racer_heat, event: event)
+
+      attrs = %{
+        result_id: racer_heat.result_id,
+        group: "Cubs",
+        racer_id: 1,
+        heat_number: 1,
+        lane_number: 1,
+        car_number: 1,
+        finish_seconds: 1.0,
+        finish_place: 1,
+        finished_at: ~N[2023-01-01 00:00:00],
+        event_id: event.id
+      }
+
+      {:ok, racer_heat} = Racing.update_or_create_racer_heat(attrs)
+
+      assert racer_heat_to_map(racer_heat) == %{
+               result_id: attrs[:result_id],
+               group: attrs[:group],
+               racer_id: attrs[:racer_id],
+               heat_number: attrs[:heat_number],
+               lane_number: attrs[:lane_number],
+               car_number: attrs[:car_number],
+               finish_seconds: attrs[:finish_seconds],
+               finish_place: attrs[:finish_place],
+               finished_at: attrs[:finished_at],
+               event_id: event.id
+             }
+    end
+
+    test "update_or_create_racer_heat/1 creates racer_heat if it does not exist" do
+      event = insert(:event)
+
+      attrs = %{
+        result_id: 1,
+        group: "Cubs",
+        racer_id: 1,
+        heat_number: 1,
+        lane_number: 1,
+        car_number: 1,
+        finish_seconds: 1.0,
+        finish_place: 1,
+        finished_at: ~N[2023-01-01 00:00:00],
+        event_id: event.id
+      }
+
+      {:ok, racer_heat} = Racing.update_or_create_racer_heat(attrs)
+
+      assert racer_heat_to_map(racer_heat) == %{
+               result_id: attrs[:result_id],
+               group: attrs[:group],
+               racer_id: attrs[:racer_id],
+               heat_number: attrs[:heat_number],
+               lane_number: attrs[:lane_number],
+               car_number: attrs[:car_number],
+               finish_seconds: attrs[:finish_seconds],
+               finish_place: attrs[:finish_place],
+               finished_at: attrs[:finished_at],
+               event_id: event.id
+             }
     end
 
     test "delete_racer_heat/1 deletes racer_heat" do

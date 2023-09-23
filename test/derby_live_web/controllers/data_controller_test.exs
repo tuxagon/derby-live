@@ -43,6 +43,7 @@ defmodule DerbyLiveWeb.DataControllerTest do
         "event_key" => event.key,
         "racer_heats" => [
           %{
+            "result_id" => 1,
             "racer_id" => 1,
             "group" => "Cubs",
             "heat_number" => 1,
@@ -50,7 +51,7 @@ defmodule DerbyLiveWeb.DataControllerTest do
             "car_number" => 101,
             "finish_seconds" => 2.0,
             "finish_place" => 1,
-            "finished_at" => "2019-01-01 12:00:00"
+            "finished_at_unix" => 1_644_678_240
           }
         ]
       })

@@ -23,6 +23,7 @@ defmodule DerbyLive.Factory do
 
   def racer_heat_factory do
     %RacerHeat{
+      result_id: sequence(:racer_id, &(&1 + 1), start_at: 1),
       group: "Cubs",
       racer_id: sequence(:racer_id, &(&1 + 1), start_at: 1),
       heat_number: sequence(:heat_number, &(&1 + 1), start_at: 1),

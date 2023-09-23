@@ -3,6 +3,7 @@ defmodule DerbyLive.Repo.Migrations.CreateRacerHeats do
 
   def change do
     create table(:racer_heats) do
+      add :result_id, :integer
       add :racer_id, :integer
       add :group, :string
       add :heat_number, :integer

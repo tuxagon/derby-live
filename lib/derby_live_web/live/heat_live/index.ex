@@ -11,6 +11,7 @@ defmodule DerbyLiveWeb.HeatLive.Index do
 
     socket =
       socket
+      |> assign(:event, event)
       |> stream_configure(:heats,
         dom_id: fn heat ->
           IO.inspect(heat)

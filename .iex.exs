@@ -1,3 +1,5 @@
+import Ecto.Query
+
 alias DerbyLive.Repo
 
 alias DerbyLive.Account

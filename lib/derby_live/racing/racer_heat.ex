@@ -5,6 +5,7 @@ defmodule DerbyLive.Racing.RacerHeat do
   alias DerbyLive.Racing.Event
 
   schema "racer_heats" do
+    field :result_id, :integer
     field :group, :string
     field :racer_id, :integer
     field :heat_number, :integer
@@ -23,6 +24,7 @@ defmodule DerbyLive.Racing.RacerHeat do
   def changeset(racer_heat, attrs) do
     racer_heat
     |> cast(attrs, [
+      :result_id,
       :racer_id,
       :group,
       :heat_number,
@@ -33,11 +35,20 @@ defmodule DerbyLive.Racing.RacerHeat do
       :finished_at,
       :event_id
     ])
-    |> validate_required([:racer_id, :group, :heat_number, :lane_number, :car_number, :event_id])
+    |> validate_required([
+      :result_id,
+      :racer_id,
+      :group,
+      :heat_number,
+      :lane_number,
+      :car_number,
+      :event_id
+    ])
   end
 
   def importable_fields do
     [
+      "result_id",
       "racer_id",
       "group",
       "heat_number",

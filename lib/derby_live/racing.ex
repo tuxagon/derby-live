@@ -35,6 +35,20 @@ defmodule DerbyLive.Racing do
     |> Repo.update()
   end
 
+  def update_or_create_racer(attrs) do
+    racer =
+      from(r in Racer,
+        where: r.racer_id == ^attrs.racer_id and r.event_id == ^attrs.event_id
+      )
+      |> Repo.one()
+
+    if racer do
+      update_racer(racer, attrs)
+    else
+      create_racer(attrs)
+    end
+  end
+
   def delete_racer(racer) do
     Repo.delete(racer)
   end
@@ -68,6 +82,20 @@ defmodule DerbyLive.Racing do
     racer_heat
     |> RacerHeat.changeset(attrs)
     |> Repo.update()
+  end
+
+  def update_or_create_racer_heat(attrs) do
+    racer_heat =
+      from(rh in RacerHeat,
+        where: rh.result_id == ^attrs.result_id and rh.event_id == ^attrs.event_id
+      )
+      |> Repo.one()
+
+    if racer_heat do
+      update_racer_heat(racer_heat, attrs)
+    else
+      create_racer_heat(attrs)
+    end
   end
 
   def delete_racer_heat(racer_heat) do
