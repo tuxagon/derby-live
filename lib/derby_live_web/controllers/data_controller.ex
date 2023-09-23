@@ -11,18 +11,26 @@ defmodule DerbyLiveWeb.DataController do
       import_racers(params, event)
       import_racer_heats(params, event)
 
+      Phoenix.PubSub.broadcast(
+        DerbyLive.PubSub,
+        topic(event),
+        {:sync_update, DateTime.utc_now()}
+      )
+
       json(conn, %{status: "ok"})
     else
       json(conn, %{status: "errror", message: "Invalid event key"})
     end
   end
 
-  def import_racers(%{"racers" => racers}, event), do: Importer.import_racers(racers, event)
+  defp import_racers(%{"racers" => racers}, event), do: Importer.import_racers(racers, event)
 
-  def import_racers(_params, _event), do: nil
+  defp import_racers(_params, _event), do: nil
 
-  def import_racer_heats(%{"racer_heats" => racer_heats}, event),
+  defp import_racer_heats(%{"racer_heats" => racer_heats}, event),
     do: Importer.import_racer_heats(racer_heats, event)
 
-  def import_racer_heats(_params, _event), do: nil
+  defp import_racer_heats(_params, _event), do: nil
+
+  defp topic(event), do: "sync_updates:#{event.key}"
 end
