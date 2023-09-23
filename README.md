@@ -41,7 +41,8 @@ SELECT
   rc.FinishPlace as 'finish_place',
   c.Class as 'group',
   rc.Lane as 'lane_number',
-  STRFTIME('%s', rc.Completed) as 'finished_at_unix'
+  CAST(STRFTIME('%s', rc.Completed) as bigint) as 'finished_at_unix',
+  rc.ResultID as 'result_id'
 FROM RaceChart rc
 INNER JOIN RegistrationInfo ri ON rc.RacerID = ri.RacerID
 INNER JOIN Classes c ON c.ClassID = rc.ClassID
