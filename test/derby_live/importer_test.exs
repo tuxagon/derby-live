@@ -2,8 +2,10 @@ defmodule DerbyLive.ImporterTest do
   use DerbyLive.DataCase, async: true
 
   alias DerbyLive.Importer
+  alias DerbyLive.Racing.Racer
+  alias DerbyLive.Racing.RacerHeat
 
-  def racer_to_map(%DerbyLive.Racing.Racer{} = racer) do
+  def racer_to_map(%Racer{} = racer) do
     %{
       "racer_id" => racer.racer_id,
       "first_name" => racer.first_name,
@@ -16,7 +18,7 @@ defmodule DerbyLive.ImporterTest do
     }
   end
 
-  def racer_heat_to_map(%DerbyLive.Racing.RacerHeat{} = racer_heat) do
+  def racer_heat_to_map(%RacerHeat{} = racer_heat) do
     %{
       "result_id" => racer_heat.result_id,
       "car_number" => racer_heat.car_number,
@@ -50,6 +52,42 @@ defmodule DerbyLive.ImporterTest do
 
     assert racer_to_map(racer) == %{
              "racer_id" => 1,
+             "first_name" => "John",
+             "last_name" => "Doe",
+             "rank" => "Tigers",
+             "group" => "Cubs",
+             "car_name" => "The Tiger",
+             "car_number" => 101,
+             "event_id" => event.id
+           }
+  end
+
+  test "import_racers/2 updates existing racer instead of creating new" do
+    event = insert(:event)
+    racer = insert(:racer, event: event)
+
+    racers = [
+      %{
+        "racer_id" => racer.racer_id,
+        "first_name" => "John",
+        "last_name" => "Doe",
+        "rank" => "Tigers",
+        "group" => "Cubs",
+        "car_name" => "The Tiger",
+        "car_number" => 101
+      }
+    ]
+
+    count_before = Repo.aggregate(Racer, :count, :racer_id)
+
+    assert [{:ok, racer}] = Importer.import_racers(racers, event)
+
+    count_after = Repo.aggregate(Racer, :count, :racer_id)
+
+    assert count_before == count_after
+
+    assert racer_to_map(racer) == %{
+             "racer_id" => racer.racer_id,
              "first_name" => "John",
              "last_name" => "Doe",
              "rank" => "Tigers",
@@ -113,6 +151,46 @@ defmodule DerbyLive.ImporterTest do
              "group" => "Cubs",
              "lane_number" => 2,
              "racer_id" => 2,
+             "heat_number" => 1,
+             "event_id" => event.id
+           }
+  end
+
+  test "import_racer_heats/2 updates existing racer heat instead of creating new" do
+    event = insert(:event)
+    racer_heat = insert(:racer_heat, event: event)
+
+    racer_heats = [
+      %{
+        "result_id" => racer_heat.result_id,
+        "car_number" => "101",
+        "finish_place" => 1,
+        "finish_seconds" => 2.0,
+        "finished_at_unix" => 1_644_678_240,
+        "group" => "Cubs",
+        "lane_number" => 1,
+        "racer_id" => 1,
+        "heat_number" => 1
+      }
+    ]
+
+    count_before = Repo.aggregate(RacerHeat, :count, :result_id)
+
+    assert [{:ok, racer_heat}] = Importer.import_racer_heats(racer_heats, event)
+
+    count_after = Repo.aggregate(RacerHeat, :count, :result_id)
+
+    assert count_before == count_after
+
+    assert racer_heat_to_map(racer_heat) == %{
+             "result_id" => racer_heat.result_id,
+             "car_number" => 101,
+             "finish_place" => 1,
+             "finish_seconds" => 2.0,
+             "finished_at" => ~N[2022-02-12 15:04:00],
+             "group" => "Cubs",
+             "lane_number" => 1,
+             "racer_id" => 1,
              "heat_number" => 1,
              "event_id" => event.id
            }
