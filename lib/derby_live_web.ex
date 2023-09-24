@@ -85,6 +85,7 @@ defmodule DerbyLiveWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import DerbyLiveWeb.CoreComponents
+      import DerbyLiveWeb.SvgComponents
       import DerbyLiveWeb.Gettext
 
       # Shortcut for generating JS commands

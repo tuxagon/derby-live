@@ -1,21 +1,35 @@
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h1><%= @event.name %></h1>
-      <ul>
-        <%= for heat <- @heats do %>
-          <li>
-            <h2>Heat <%= heat.heat_number %></h2>
-            <ul>
-              <%= for lane <- heat.lanes do %>
-                <li>
-                  <%= lane.racer_heat.lane_number %>: (<%= lane.racer_heat.finish_place %>) <%= lane.racer.racer_id %> <%= lane.racer.car_number %> - <%= lane.racer.first_name %> <%= lane.racer.last_name %>
-                </li>
-              <% end %>
-            </ul>
-          </li>
-        <% end %>
-      </ul>
-    </div>
+<div class="mx-auto max-w-screen-md pl-4">
+  <div class="text-3xl font-bold mb-4 pr-4">
+    <h1><%= @event.name %></h1>
   </div>
+
+  <div class="text-2xl font-bold mb-4 pr-4">
+    <h2>Current Heat <span class="font-normal">(<%= @current_heat.heat_number %>)</span></h2>
+  </div>
+  <.single_heat heat={@current_heat} />
+
+  <div class="text-2xl font-bold my-4 pr-4">
+    <h2>Next Heat <span class="font-normal">(<%= @next_heat.heat_number %>)</span></h2>
+  </div>
+  <.single_heat heat={@next_heat} />
+
+  <div class="text-2xl font-bold my-4 pr-4">
+    <h2>Upcoming Heats</h2>
+  </div>
+  <%= for heat <- @unfinished_heats do %>
+    <div class="my-4 font-bold pr-4">
+      <h3>Heat <%= heat.heat_number %></h3>
+    </div>
+    <.single_heat heat={heat} />
+  <% end %>
+
+  <div class="text-2xl font-bold my-4 pr-4">
+    <h2>Finished Heats</h2>
+  </div>
+  <%= for heat <- @finished_heats do %>
+    <div class="my-4 font-bold pr-4">
+      <h3>Heat <%= heat.heat_number %></h3>
+    </div>
+    <.single_heat heat={heat} />
+  <% end %>
 </div>

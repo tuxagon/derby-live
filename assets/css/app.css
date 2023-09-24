@@ -3,3 +3,16 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+.scale-25 {
+  transform: scale(.25);
+}
+
+.bg-cubs-blue {
+  background-color: #003f87;
+}
+
+.bg-cubs-yellow {
+  background-color: #fcd116;
+}
+
+
