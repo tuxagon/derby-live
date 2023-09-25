@@ -1,0 +1,15 @@
+# Sync utility
+derby-live-sync/
+
+# Elixir Artifacts
+/_build/
+/deps/
+erl_crash.dump
+
+# Node Artifacts
+npm-debug.log
+/assets/node_modules/
+
+# Docker only
+/test/
+/.iex.exs
