@@ -28,12 +28,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: "./derby-live-sync/src-tauri -> target"
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+          workspaces: "${{ env.working-directory }}/src-tauri -> target"
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
@@ -41,7 +36,14 @@ jobs:
           node-version: "lts/*"
           cache: "pnpm"
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
       - name: Install frontend dependencies
+        working-directory: ${{ env.working-directory }}
         run: |
           pnpm install
           pnpm build
@@ -57,4 +59,4 @@ jobs:
           releaseBody: "See the assets to download and install this version."
           releaseDraft: true
           prerelease: false
-          projectPath: ./derby-live-sync
+          projectPath: ${{ env.working-directory }}
