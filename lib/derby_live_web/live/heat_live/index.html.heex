@@ -3,33 +3,47 @@
     <h1><%= @event.name %></h1>
   </div>
 
-  <div class="text-2xl font-bold mb-4 pr-4">
-    <h2>Current Heat <span class="font-normal">(<%= @current_heat.heat_number %>)</span></h2>
-  </div>
-  <.single_heat heat={@current_heat} />
-
-  <div class="text-2xl font-bold my-4 pr-4">
-    <h2>Next Heat <span class="font-normal">(<%= @next_heat.heat_number %>)</span></h2>
-  </div>
-  <.single_heat heat={@next_heat} />
-
-  <div class="text-2xl font-bold my-4 pr-4">
-    <h2>Upcoming Heats</h2>
-  </div>
-  <%= for heat <- @unfinished_heats do %>
-    <div class="my-4 font-bold pr-4">
-      <h3>Heat <%= heat.heat_number %></h3>
+  <%= if @current_heat do %>
+    <div class="text-2xl font-bold mb-4 pr-4">
+      <h2>Current Heat <span class="font-normal">(<%= @current_heat.heat_number %>)</span></h2>
     </div>
-    <.single_heat heat={heat} />
+    <.single_heat heat={@current_heat} />
   <% end %>
 
-  <div class="text-2xl font-bold my-4 pr-4">
-    <h2>Finished Heats</h2>
-  </div>
-  <%= for heat <- @finished_heats do %>
-    <div class="my-4 font-bold pr-4">
-      <h3>Heat <%= heat.heat_number %></h3>
+  <%= if @next_heat do %>
+    <div class="text-2xl font-bold my-4 pr-4">
+      <h2>Next Heat <span class="font-normal">(<%= @next_heat.heat_number %>)</span></h2>
     </div>
-    <.single_heat heat={heat} />
+    <.single_heat heat={@next_heat} />
+  <% end %>
+
+  <%= if @unfinished_heats do %>
+    <div class="text-2xl font-bold my-4 pr-4">
+      <h2>Upcoming Heats</h2>
+    </div>
+    <%= for heat <- @unfinished_heats do %>
+      <div class="my-4 font-bold pr-4">
+        <h3>Heat <%= heat.heat_number %></h3>
+      </div>
+      <.single_heat heat={heat} />
+    <% end %>
+  <% end %>
+
+  <%= if @finished_heats do %>
+    <div class="text-2xl font-bold my-4 pr-4">
+      <h2>Finished Heats</h2>
+    </div>
+    <%= for heat <- @finished_heats do %>
+      <div class="my-4 font-bold pr-4">
+        <h3>Heat <%= heat.heat_number %></h3>
+      </div>
+      <.single_heat heat={heat} />
+    <% end %>
+  <% end %>
+
+  <%= if @heats == 0 do %>
+    <div class="text-2xl font-bold my-4 pr-4">
+      <h2>No Heats</h2>
+    </div>
   <% end %>
 </div>

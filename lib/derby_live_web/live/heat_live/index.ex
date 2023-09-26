@@ -52,7 +52,8 @@ defmodule DerbyLiveWeb.HeatLive.Index do
       current_heat: heat_with_color_per_lane(current_heat),
       next_heat: next_heat,
       finished_heats: finished_heats,
-      unfinished_heats: unfinished_heats |> Enum.drop(2)
+      unfinished_heats: unfinished_heats |> Enum.drop(2),
+      heats_count: length(heats)
     )
   end
 
@@ -77,6 +78,8 @@ defmodule DerbyLiveWeb.HeatLive.Index do
 
     {current_heat, next_heat, finished_heats, unfinished_heats}
   end
+
+  defp heat_with_color_per_lane(nil), do: nil
 
   defp heat_with_color_per_lane(heat) do
     colors =
