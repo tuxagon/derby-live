@@ -15,7 +15,7 @@ defmodule DerbyLive.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: DerbyLive.PubSub},
       # Start Finch
-      {Finch, name: Swoosh.Finch},
+      {Finch, name: DerbyLive.Finch},
       # Start the Endpoint (http/https)
       DerbyLiveWeb.Endpoint
       # Start a worker by calling: DerbyLive.Worker.start_link(arg)
