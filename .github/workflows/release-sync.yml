@@ -41,6 +41,7 @@ jobs:
         with:
           node-version: "lts/*"
           cache: "pnpm"
+          cache-dependency-path: "**/derby-live-sync/pnpm-lock.yaml"
 
       - name: Install frontend dependencies
         working-directory: ${{ env.working-directory }}
