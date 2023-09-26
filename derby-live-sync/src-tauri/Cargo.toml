@@ -9,9 +9,6 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[env]
-DERBY_LIVE_API_URL = "http://localhost:4000"
-
 [build-dependencies]
 tauri-build = { version = "1.4", features = [] }
 
@@ -30,3 +27,4 @@ log = { version = "0.4.20", features = ["max_level_debug", "release_max_level_wa
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+production = []

@@ -18,6 +18,17 @@ use std::{
 use synchronize::{SyncCreationError, SyncState, Synchronizer};
 use tauri::Manager;
 
+fn get_server_url() -> String {
+    #[cfg(feature = "production")]
+    {
+        "https://derby-live.fly.dev".to_string()
+    }
+    #[cfg(not(feature = "production"))]
+    {
+        "http://localhost:4000".to_string()
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 struct AppSettings {
@@ -29,8 +40,7 @@ struct AppSettings {
 
 impl Default for AppSettings {
     fn default() -> Self {
-        let url =
-            std::env::var("DERBY_LIVE_API_URL").unwrap_or("http://localhost:4000".to_string());
+        let url = get_server_url();
 
         Self {
             api_key: Default::default(),
@@ -53,6 +63,10 @@ impl AppSettings {
         if path.as_ref().exists() {
             self.database_path = Some(path.as_ref().to_path_buf());
         }
+    }
+
+    fn update_server_url(&mut self, url: String) {
+        self.server_url = url;
     }
 }
 
@@ -237,6 +251,7 @@ fn main() {
                     let state: tauri::State<'_, Arc<Mutex<AppState>>> = app.state();
                     let mut state_locked = state.lock().unwrap();
                     state_locked.app_settings = app_settings;
+                    state_locked.app_settings.update_server_url(get_server_url());
                 }
                 Err(_) => {
                     info!(target: "setup", "no settings.json found");

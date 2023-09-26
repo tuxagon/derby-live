@@ -82,6 +82,7 @@ jobs:
         with:
           releaseId: ${{ env.release_id }}
           projectPath: ${{ env.working-directory }}
+          args: "--features production"
 
   publish-release:
     permissions:
