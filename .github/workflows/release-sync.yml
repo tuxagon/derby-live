@@ -7,7 +7,39 @@ on:
         required: true
 
 jobs:
-  release:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+    env:
+      version: ${{ github.event.inputs.version }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: create release
+        id: create-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: "sync-v${{ env.version }}",
+              name: "Derby Live Sync v${{ env.version }}",
+              body: "See the assets to download and install this version.",
+              draft: true,
+              prerelease: false
+            })
+            return data.id
+
+  build-tauri:
+    needs: create-release
     permissions:
       contents: write
     strategy:
@@ -16,48 +48,60 @@ jobs:
         platform: [macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     env:
+      release_id: ${{ needs.create-release.outputs.release_id }}
       working-directory: ./derby-live-sync
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Rust setup
+      - uses: actions/checkout@v3
+      - name: setup rust
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Rust cache
+      - name: rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "${{ env.working-directory }}/src-tauri -> target"
-
-      - name: Install pnpm
+      - name: setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
-
-      - name: Sync node version and setup cache
+      - name: sync node version and setup cache
         uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
           cache: "pnpm"
           cache-dependency-path: "**/derby-live-sync/pnpm-lock.yaml"
-
-      - name: Install frontend dependencies
+      - name: install frontend dependencies
         working-directory: ${{ env.working-directory }}
         run: |
           pnpm install
           pnpm build
-
-      - name: Build the app
+      - name: build tauri
         uses: tauri-apps/tauri-action@v0
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.event.inputs.version }} # This only works if your workflow triggers on new tags.
-          releaseName: "Derby Live Sync v__VERSION__" # tauri-action replaces \_\_VERSION\_\_ with the app version.
-          releaseBody: "See the assets to download and install this version."
-          releaseDraft: true
-          prerelease: false
+          releaseId: ${{ env.release_id }}
           projectPath: ${{ env.working-directory }}
+
+  publish-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    needs: [create-release, build-tauri]
+    env:
+      release_id: ${{ needs.create-release.outputs.release_id }}
+
+    steps:
+      - name: publish release
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ env.release_id }}
+        with:
+          script: |
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ env.release_id }},
+              draft: false,
+              prerelease: false
+            })
