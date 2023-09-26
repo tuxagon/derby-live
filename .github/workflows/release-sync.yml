@@ -1,9 +1,10 @@
 name: Release Sync App
 on:
-  push:
-    tags:
-      - "sync-v*"
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
 
 jobs:
   release:
@@ -50,7 +51,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
+          tagName: ${{ github.event.inputs.version }} # This only works if your workflow triggers on new tags.
           releaseName: "Derby Live Sync v__VERSION__" # tauri-action replaces \_\_VERSION\_\_ with the app version.
           releaseBody: "See the assets to download and install this version."
           releaseDraft: true
