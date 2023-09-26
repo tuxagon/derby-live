@@ -2,7 +2,7 @@ name: Release Sync App
 on:
   push:
     tags:
-      - 'sync-v*'
+      - "sync-v*"
   workflow_dispatch:
 
 jobs:
@@ -25,13 +25,18 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './derby-live-sync/src-tauri -> target'
+          workspaces: "./derby-live-sync/src-tauri -> target"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
+          node-version: "lts/*"
+          cache: "pnpm"
 
       - name: Install frontend dependencies
         working-directory: ./derby-live-sync
@@ -46,9 +51,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
-          releaseName: 'Derby Live Sync v__VERSION__' # tauri-action replaces \_\_VERSION\_\_ with the app version.
-          releaseBody: 'See the assets to download and install this version.'
+          releaseName: "Derby Live Sync v__VERSION__" # tauri-action replaces \_\_VERSION\_\_ with the app version.
+          releaseBody: "See the assets to download and install this version."
           releaseDraft: true
           prerelease: false
           projectPath: ./derby-live-sync
-
