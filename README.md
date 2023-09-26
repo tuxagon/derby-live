@@ -10,9 +10,28 @@ MAILER_FROM_NAME=
 MAILER_FROM_ADDRESS=
 ```
 
-## Dev notes
+## Dev notes for Derby Live Sync
 
 - `fswatch -o tmp/example.sqlite | xargs -n1 -I{} ruby -e 'puts "changed @ #{Time.now}"'` was not triggering a change for unknown reasons. To get it working, add `-m poll_monitor` to the command, like `fswatch -m poll_monitor -o tmp/example.sqlite | xargs -n1 -I{} ruby -e 'puts "changed @ #{Time.now}"'`.
+
+### Releases
+
+#### Website
+
+Deploying to Fly until deploy is in CI
+
+```
+fly deploy
+```
+
+#### Sync app
+
+This is handled with the Release Sync workflow, which is manually triggered for now.
+
+To build a release,
+
+1. Bump the version in `src-tauri/tauri.conf.json`
+2. Kick off the workflow with the same version as in `tauri.conf.json`
 
 ## Dev Notes about Gran Prix Race Manager
 
