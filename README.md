@@ -6,6 +6,8 @@ This app is a live front end for [Gran Prix Race Manager](https://grandprix-soft
 
 ```
 SENDGRID_API_KEY=
+MAILER_FROM_NAME=
+MAILER_FROM_ADDRESS=
 ```
 
 ## Dev notes

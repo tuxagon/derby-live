@@ -27,7 +27,9 @@ config :derby_live, DerbyLiveWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :derby_live, DerbyLive.Mailer, adapter: Swoosh.Adapters.Local
+config :derby_live, DerbyLive.Mailer,
+  adapter: Swoosh.Adapters.Local,
+  sender: %{name: "Derby Live", email: "noreply@example.com"}
 
 # Configure esbuild (the version is required)
 config :esbuild,

@@ -103,7 +103,11 @@ if config_env() == :prod do
   #
   config :derby_live, DerbyLive.Mailer,
     adapter: Swoosh.Adapters.Sendgrid,
-    api_key: System.get_env("SENDGRID_API_KEY")
+    api_key: System.get_env("SENDGRID_API_KEY"),
+    sender: %{
+      name: System.get_env("MAILER_FROM_NAME"),
+      email: System.get_env("MAILER_FROM_ADDRESS")
+    }
 
   #
   # For this example you need include a HTTP client required by Swoosh API client.

@@ -4,12 +4,10 @@ defmodule DerbyLive.Email do
   require Phoenix.VerifiedRoutes
   import Swoosh.Email
 
-  # TODO: Provide sender via config
-
   def login_link(user) do
     new()
     |> to(user)
-    |> from({from_name(), from_email()})
+    |> from(configured_sender())
     |> subject("Login to Derby Live")
     |> html_body(build_html(user))
     |> text_body(build_text(user))
@@ -33,7 +31,8 @@ defmodule DerbyLive.Email do
 
   defp login_link_url(%{auth_token: auth_token}), do: url(~p"/auth/verify/#{auth_token}/")
 
-  defp from_name, do: "Derby Live"
-
-  defp from_email, do: "noreply@example.com"
+  defp configured_sender do
+    %{name: name, email: email} = Application.get_env(:derby_live, DerbyLive.Mailer)[:sender]
+    {name, email}
+  end
 end
