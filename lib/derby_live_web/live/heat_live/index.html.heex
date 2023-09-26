@@ -17,7 +17,7 @@
     <.single_heat heat={@next_heat} />
   <% end %>
 
-  <%= if @unfinished_heats do %>
+  <%= if length(@unfinished_heats) > 0 do %>
     <div class="text-2xl font-bold my-4 pr-4">
       <h2>Upcoming Heats</h2>
     </div>
@@ -29,7 +29,7 @@
     <% end %>
   <% end %>
 
-  <%= if @finished_heats do %>
+  <%= if length(@finished_heats) > 0 do %>
     <div class="text-2xl font-bold my-4 pr-4">
       <h2>Finished Heats</h2>
     </div>
