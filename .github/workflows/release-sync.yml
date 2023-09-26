@@ -15,6 +15,8 @@ jobs:
       matrix:
         platform: [macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
+    env:
+      working-directory: ./derby-live-sync
 
     steps:
       - name: Checkout repository
@@ -40,7 +42,6 @@ jobs:
           cache: "pnpm"
 
       - name: Install frontend dependencies
-        working-directory: ./derby-live-sync
         run: |
           pnpm install
           pnpm build
