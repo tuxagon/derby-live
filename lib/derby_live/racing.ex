@@ -106,7 +106,7 @@ defmodule DerbyLive.Racing do
     from(rh in RacerHeat,
       join: r in Racer,
       on: rh.racer_id == r.racer_id,
-      where: rh.event_id == ^event.id,
+      where: rh.event_id == ^event.id and r.event_id == ^event.id,
       order_by: [asc: rh.heat_number],
       select: {r, rh}
     )
