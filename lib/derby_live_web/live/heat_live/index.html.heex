@@ -41,7 +41,7 @@
     <% end %>
   </div>
 
-  <div class="flex justify-between my-2">
+  <div class="flex justify-between items-center my-2">
     <.button
       phx-click="select_previous_heat"
       disabled={
@@ -51,6 +51,9 @@
     >
       Previous Heat
     </.button>
+    <%= if @current_heat_changed && @selected_heat != @current_heat do %>
+      <p class="text-sm">Heat <%= @current_heat.heat_number %> on deck</p>
+    <% end %>
     <.button
       phx-click="select_current_heat"
       disabled={@current_heat.heat_number == @selected_heat.heat_number}

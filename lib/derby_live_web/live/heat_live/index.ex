@@ -18,7 +18,8 @@ defmodule DerbyLiveWeb.HeatLive.Index do
       |> assign(
         event: event,
         show_heat_selection: true,
-        selected_heat: nil
+        selected_heat: nil,
+        current_heat: nil
       )
       |> fetch_and_assign_heats(event)
 
@@ -34,16 +35,23 @@ defmodule DerbyLiveWeb.HeatLive.Index do
 
   def handle_event("select_heat", %{"heat-number" => heat_number}, socket) do
     heats = socket.assigns.heats
+    current_heat = socket.assigns.current_heat
 
     selected_heat =
       Enum.find(heats, fn heat -> heat.heat_number == String.to_integer(heat_number) end)
 
-    {:noreply, assign(socket, selected_heat: selected_heat)}
+    {:noreply,
+     assign(socket,
+       selected_heat: selected_heat,
+       current_heat_changed:
+         socket.assigns.current_heat_changed &&
+           selected_heat.heat_number != current_heat.heat_number
+     )}
   end
 
   def handle_event("select_current_heat", _params, socket) do
     current_heat = socket.assigns.current_heat
-    {:noreply, assign(socket, selected_heat: current_heat)}
+    {:noreply, assign(socket, selected_heat: current_heat, current_heat_changed: false)}
   end
 
   def handle_event("select_previous_heat", _params, socket) do
@@ -68,17 +76,8 @@ defmodule DerbyLiveWeb.HeatLive.Index do
       socket
       |> assign(:last_updated_at, last_updated_at)
       |> fetch_and_assign_heats(event)
-      |> select_heat_if_needed()
 
     {:noreply, socket}
-  end
-
-  defp select_heat_if_needed(socket) do
-    if socket.assigns.selected_heat == nil do
-      assign(socket, selected_heat: socket.assigns.current_heat)
-    else
-      socket
-    end
   end
 
   defp fetch_and_assign_heats(socket, event) do
@@ -90,13 +89,27 @@ defmodule DerbyLiveWeb.HeatLive.Index do
         |> heat_with_color_per_lane()
       end)
 
+    existing_current_heat = socket.assigns.current_heat
+    existing_selected_heat = socket.assigns.selected_heat
+
     {current_heat, next_heat, finished_heats, unfinished_heats} =
       split_heats_into_finished_and_unfinished(heats)
 
+    selected_heat =
+      if existing_selected_heat != nil && existing_current_heat != nil &&
+           existing_current_heat.heat_number != existing_selected_heat.heat_number do
+        Enum.find(heats, fn heat -> heat.heat_number == existing_selected_heat.heat_number end)
+      else
+        current_heat
+      end
+
     assign(socket,
       heats: heats,
-      selected_heat: current_heat,
+      selected_heat: selected_heat,
       current_heat: current_heat,
+      current_heat_changed:
+        existing_current_heat != nil &&
+          existing_current_heat.heat_number != current_heat.heat_number,
       next_heat: next_heat,
       finished_heats: finished_heats,
       unfinished_heats: unfinished_heats |> Enum.drop(2),
