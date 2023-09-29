@@ -27,7 +27,6 @@ defmodule DerbyLiveWeb.Router do
   scope "/", DerbyLiveWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
     get "/auth", AuthController, :index
     post "/auth/login", AuthController, :login
     delete "/auth/logout", AuthController, :logout
