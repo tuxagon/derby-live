@@ -52,7 +52,8 @@ defmodule DerbyLive.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:ex_machina, "~> 2.7.0", only: :test},
       {:faker, "~> 0.17"},
-      {:phoenix_swoosh, "~> 1.0"}
+      {:phoenix_swoosh, "~> 1.0"},
+      {:timex, "~> 3.7"}
     ]
   end
 
