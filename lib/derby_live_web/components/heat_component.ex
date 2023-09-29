@@ -1,7 +1,6 @@
 defmodule DerbyLiveWeb.HeatComponent do
   use Phoenix.Component
 
-  import DerbyLiveWeb.CoreComponents
   import DerbyLiveWeb.SvgComponents
 
   embed_templates "heat_templates/*"
@@ -19,13 +18,17 @@ defmodule DerbyLiveWeb.HeatComponent do
   attr :class, :string, default: nil
 
   def heat_select_button(assigns) do
-    color_class =
-      case assigns.heat_location do
-        :current -> "bg-green-500 hover:bg-green-400"
-        :next -> "bg-yellow-500 hover:bg-yellow-400"
-        :upcoming -> "bg-red-500 hover:bg-red-400"
-        :finished -> "bg-gray-500 hover:bg-gray-400"
-      end
+    assigns =
+      assign(
+        assigns,
+        :heat_select_button_color_class,
+        case assigns.heat_location do
+          :current -> "bg-green-500 hover:bg-green-400"
+          :next -> "bg-yellow-500 hover:bg-yellow-400"
+          :upcoming -> "bg-red-500 hover:bg-red-400"
+          :finished -> "bg-gray-500 hover:bg-gray-400"
+        end
+      )
 
     ~H"""
     <button
@@ -34,7 +37,7 @@ defmodule DerbyLiveWeb.HeatComponent do
       class={[
         "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
-        color_class,
+        @heat_select_button_color_class,
         @class
       ]}
     >

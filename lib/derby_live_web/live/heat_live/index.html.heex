@@ -1,5 +1,5 @@
-<div class="mx-auto max-w-screen-md pl-4">
-  <div class="text-3xl font-bold mb-4 pr-4">
+<div class="mx-auto max-w-screen-md px-2">
+  <div class="text-3xl font-bold mb-4 pr-4 text-center">
     <h1><%= @event.name %></h1>
   </div>
 
@@ -8,7 +8,7 @@
       <%= if @show_heat_selection, do: "Hide Individual Heats", else: "Show Individual Heats" %>
     </.button>
     <%= if @show_heat_selection do %>
-      <div class="flex flex-wrap my-4 gap-2 font-mono justify-start items-center">
+      <div class="flex flex-wrap my-4 gap-2 font-mono justify-center items-start">
         <%= for heat_number <- 1..@heats_count do %>
           <%= cond do %>
             <% heat_number < @current_heat.heat_number -> %>
