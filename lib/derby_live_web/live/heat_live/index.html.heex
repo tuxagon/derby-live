@@ -3,47 +3,63 @@
     <h1><%= @event.name %></h1>
   </div>
 
-  <%= if @current_heat do %>
-    <div class="text-2xl font-bold mb-4 pr-4">
-      <h2>Current Heat <span class="font-normal">(<%= @current_heat.heat_number %>)</span></h2>
-    </div>
-    <.single_heat heat={@current_heat} />
-  <% end %>
-
-  <%= if @next_heat do %>
-    <div class="text-2xl font-bold my-4 pr-4">
-      <h2>Next Heat <span class="font-normal">(<%= @next_heat.heat_number %>)</span></h2>
-    </div>
-    <.single_heat heat={@next_heat} />
-  <% end %>
-
-  <%= if length(@unfinished_heats) > 0 do %>
-    <div class="text-2xl font-bold my-4 pr-4">
-      <h2>Upcoming Heats</h2>
-    </div>
-    <%= for heat <- @unfinished_heats do %>
-      <div class="my-4 font-bold pr-4">
-        <h3>Heat <%= heat.heat_number %></h3>
+  <div class="flex flex-col justify-center items-center my-2">
+    <.button phx-click="toggle_heat_selection">
+      <%= if @show_heat_selection, do: "Hide Individual Heats", else: "Show Individual Heats" %>
+    </.button>
+    <%= if @show_heat_selection do %>
+      <div class="flex flex-wrap my-4 gap-2 font-mono justify-start items-center">
+        <%= for heat_number <- 1..@heats_count do %>
+          <%= cond do %>
+            <% heat_number < @current_heat.heat_number -> %>
+              <.heat_select_button
+                heat_number={heat_number}
+                heat_location={:finished}
+                class="bg-slate-300"
+              />
+            <% heat_number == @current_heat.heat_number -> %>
+              <.heat_select_button
+                heat_number={heat_number}
+                heat_location={:current}
+                class="bg-cyan-300"
+              />
+            <% heat_number == @next_heat.heat_number -> %>
+              <.heat_select_button
+                heat_number={heat_number}
+                heat_location={:next}
+                class="bg-yellow-300"
+              />
+            <% heat_number > @next_heat.heat_number -> %>
+              <.heat_select_button
+                heat_number={heat_number}
+                heat_location={:upcoming}
+                class="bg-red-300"
+              />
+          <% end %>
+        <% end %>
       </div>
-      <.single_heat heat={heat} />
     <% end %>
-  <% end %>
+  </div>
 
-  <%= if length(@finished_heats) > 0 do %>
-    <div class="text-2xl font-bold my-4 pr-4">
-      <h2>Finished Heats</h2>
-    </div>
-    <%= for heat <- @finished_heats do %>
-      <div class="my-4 font-bold pr-4">
-        <h3>Heat <%= heat.heat_number %></h3>
-      </div>
-      <.single_heat heat={heat} />
-    <% end %>
-  <% end %>
+  <div class="flex justify-between my-2">
+    <.button
+      phx-click="select_previous_heat"
+      disabled={
+        @current_heat.heat_number < 2 ||
+          @selected_heat.heat_number == @current_heat.heat_number - 1
+      }
+    >
+      Previous Heat
+    </.button>
+    <.button
+      phx-click="select_current_heat"
+      disabled={@current_heat.heat_number == @selected_heat.heat_number}
+    >
+      Current Heat
+    </.button>
+  </div>
 
-  <%= if @heats == 0 do %>
-    <div class="text-2xl font-bold my-4 pr-4">
-      <h2>No Heats</h2>
-    </div>
+  <%= if @selected_heat do %>
+    <.heat heat={@selected_heat} />
   <% end %>
 </div>
