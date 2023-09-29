@@ -34,7 +34,7 @@ defmodule DerbyLiveWeb.Router do
     get "/auth/verify/:token", AuthController, :verify
 
     live "/:event_key/heats", HeatLive.Index
-    live "/:event_key/racers", RacerLive.Index
+    # live "/:event_key/racers", RacerLive.Index
   end
 
   ## Authentication routes
