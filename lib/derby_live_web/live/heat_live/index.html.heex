@@ -3,64 +3,70 @@
     <h1><%= @event.name %></h1>
   </div>
 
-  <div class="flex flex-col justify-center items-center my-2">
-    <.button phx-click="toggle_heat_selection">
-      <%= if @show_heat_selection, do: "Hide Individual Heats", else: "Show Individual Heats" %>
-    </.button>
-    <%= if @show_heat_selection do %>
-      <div class="flex flex-wrap my-4 gap-2 font-mono justify-center items-start">
-        <%= for heat_number <- 1..@heats_count do %>
-          <%= cond do %>
-            <% heat_number < @current_heat.heat_number -> %>
-              <.heat_select_button
-                heat_number={heat_number}
-                heat_location={:finished}
-                class="bg-slate-300"
-              />
-            <% heat_number == @current_heat.heat_number -> %>
-              <.heat_select_button
-                heat_number={heat_number}
-                heat_location={:current}
-                class="bg-cyan-300"
-              />
-            <% heat_number == @next_heat.heat_number -> %>
-              <.heat_select_button
-                heat_number={heat_number}
-                heat_location={:next}
-                class="bg-yellow-300"
-              />
-            <% heat_number > @next_heat.heat_number -> %>
-              <.heat_select_button
-                heat_number={heat_number}
-                heat_location={:upcoming}
-                class="bg-red-300"
-              />
+  <%= if @current_heat do %>
+    <div class="flex flex-col justify-center items-center my-2">
+      <.button phx-click="toggle_heat_selection">
+        <%= if @show_heat_selection, do: "Hide Individual Heats", else: "Show Individual Heats" %>
+      </.button>
+      <%= if @show_heat_selection do %>
+        <div class="flex flex-wrap my-4 gap-2 font-mono justify-center items-start">
+          <%= for heat_number <- 1..@heats_count do %>
+            <%= cond do %>
+              <% heat_number < @current_heat.heat_number -> %>
+                <.heat_select_button
+                  heat_number={heat_number}
+                  heat_location={:finished}
+                  class="bg-slate-300"
+                />
+              <% heat_number == @current_heat.heat_number -> %>
+                <.heat_select_button
+                  heat_number={heat_number}
+                  heat_location={:current}
+                  class="bg-cyan-300"
+                />
+              <% heat_number == @next_heat.heat_number -> %>
+                <.heat_select_button
+                  heat_number={heat_number}
+                  heat_location={:next}
+                  class="bg-yellow-300"
+                />
+              <% heat_number > @next_heat.heat_number -> %>
+                <.heat_select_button
+                  heat_number={heat_number}
+                  heat_location={:upcoming}
+                  class="bg-red-300"
+                />
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-center">There are no heats scheduled for this event.</p>
+  <% end %>
 
-  <div class="flex justify-between items-center my-2">
-    <.button
-      phx-click="select_previous_heat"
-      disabled={
-        @current_heat.heat_number < 2 ||
-          @selected_heat.heat_number == @current_heat.heat_number - 1
-      }
-    >
-      Previous Heat
-    </.button>
-    <%= if @current_heat_changed && @selected_heat != @current_heat do %>
-      <p class="text-sm">Heat <%= @current_heat.heat_number %> on deck</p>
-    <% end %>
-    <.button
-      phx-click="select_current_heat"
-      disabled={@current_heat.heat_number == @selected_heat.heat_number}
-    >
-      Current Heat
-    </.button>
-  </div>
+  <%= if @current_heat || @selected_heat do %>
+    <div class="flex justify-between items-center my-2">
+      <.button
+        phx-click="select_previous_heat"
+        disabled={
+          @current_heat.heat_number < 2 ||
+            @selected_heat.heat_number == @current_heat.heat_number - 1
+        }
+      >
+        Previous Heat
+      </.button>
+      <%= if @current_heat_changed && @selected_heat != @current_heat do %>
+        <p class="text-sm">Heat <%= @current_heat.heat_number %> on deck</p>
+      <% end %>
+      <.button
+        phx-click="select_current_heat"
+        disabled={@current_heat.heat_number == @selected_heat.heat_number}
+      >
+        Current Heat
+      </.button>
+    </div>
+  <% end %>
 
   <%= if @selected_heat do %>
     <.heat heat={@selected_heat} />
