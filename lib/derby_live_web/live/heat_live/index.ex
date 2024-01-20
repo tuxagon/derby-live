@@ -5,7 +5,6 @@ defmodule DerbyLiveWeb.HeatLive.Index do
   alias DerbyLive.Racing
   alias DerbyLive.Racing.Heat
 
-  @gray_color "aaaaaa"
   @car_colors ~w(e04242 e07a42 e0c242 e0e042 7ae042 42e042 42e07a 42e0c2 42e0e0 427ae0 4242e0 7a42e0 c242e0 e042e0 c2427a)
 
   @impl true
