@@ -139,8 +139,6 @@ defmodule DerbyLiveWeb.HeatLive.Index do
     {current_heat, next_heat, finished_heats, unfinished_heats}
   end
 
-  defp heat_with_color_per_lane(nil), do: nil
-
   defp heat_with_color_per_lane(heat) do
     colors =
       Enum.map(heat.lanes, fn lane ->
@@ -150,9 +148,5 @@ defmodule DerbyLiveWeb.HeatLive.Index do
       end)
 
     Heat.add_color_to_each_lane(heat, colors)
-  end
-
-  defp heat_with_gray_color_per_lane(heat) do
-    Heat.add_color_to_each_lane(heat, Enum.map(heat.lanes, fn _lane -> @gray_color end))
   end
 end

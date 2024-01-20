@@ -118,6 +118,7 @@ defmodule DerbyLive.Racing do
         lanes: Enum.map(lanes, fn {r, rh} -> %Lane{racer: r, racer_heat: rh} end)
       }
     end)
+    |> Enum.sort_by(fn heat -> heat.heat_number end)
   end
 
   alias DerbyLive.Racing.Event
