@@ -55,9 +55,7 @@
         <%= if lane.racer_heat.finish_place do %>
           <div class="absolute bottom-0 pl-1 left-0">
             <p class="text-xs italic">
-              Finished <%= place_ordinal(lane.racer_heat.finish_place) %> in <%= lane.racer_heat.finish_seconds %> seconds <%= human_time(
-                lane.racer_heat.finished_at
-              ) %>
+              Finished <%= place_ordinal(lane.racer_heat.finish_place) %> in <%= lane.racer_heat.finish_seconds %> seconds
             </p>
           </div>
         <% end %>
