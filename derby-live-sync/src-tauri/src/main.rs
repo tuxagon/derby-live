@@ -6,6 +6,7 @@ extern crate serde;
 extern crate tauri;
 
 mod client_notify;
+mod database;
 mod logger;
 mod synchronize;
 

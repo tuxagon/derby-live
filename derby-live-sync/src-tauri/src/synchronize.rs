@@ -5,7 +5,6 @@ extern crate tauri;
 
 use log::info;
 use notify::{Config, PollWatcher, RecursiveMode, Watcher};
-use rusqlite::{params, Connection};
 use serde::Serialize;
 use std::{
     fmt,
@@ -19,6 +18,7 @@ use std::{
 use tauri::AppHandle;
 
 use crate::client_notify;
+use crate::database;
 
 #[derive(Clone)]
 pub struct SyncState {
@@ -73,34 +73,10 @@ pub struct Synchronizer {
 }
 
 #[derive(Debug, Serialize)]
-struct Racer {
-    racer_id: i32,
-    last_name: String,
-    first_name: String,
-    car_number: i32,
-    car_name: Option<String>,
-    group: String,
-    rank: String,
-}
-
-#[derive(Debug, Serialize)]
-struct RacerHeat {
-    car_number: i32,
-    racer_id: i32,
-    heat_number: i32,
-    finish_seconds: Option<f64>,
-    finish_place: Option<i32>,
-    group: String,
-    lane_number: i32,
-    finished_at_unix: Option<i64>,
-    result_id: i32,
-}
-
-#[derive(Debug, Serialize)]
 struct RequestData {
     event_key: String,
-    racers: Vec<Racer>,
-    racer_heats: Vec<RacerHeat>,
+    racers: Vec<database::Racer>,
+    racer_heats: Vec<database::RacerHeat>,
 }
 
 enum SyncMessage {
@@ -125,10 +101,6 @@ impl fmt::Display for SyncError {
     }
 }
 
-struct DatabaseConnector {
-    conn: Connection,
-}
-
 struct Uploader {
     api_key: String,
     event_key: String,
@@ -148,12 +120,12 @@ impl Synchronizer {
         info!(target: "sync", "run_sync");
 
         let database_path = sync_state.watched_path.clone();
-        let db = DatabaseConnector::new(database_path.clone());
+        let db = database::Client::new(database_path.clone());
         let (racers, racer_heats) = match db.collect_data() {
             Ok(data) => data,
             Err(e) => {
                 client_notify::sync_error(sync_state.app_handle.clone(), e.to_string());
-                return Err(e);
+                return Err(SyncError::DatabaseError(e));
             }
         };
 
@@ -301,106 +273,6 @@ impl Synchronizer {
     }
 }
 
-impl DatabaseConnector {
-    pub fn new(path: PathBuf) -> DatabaseConnector {
-        let conn = Connection::open(path).expect("Failed to open database");
-        DatabaseConnector { conn }
-    }
-
-    fn collect_data(&self) -> Result<(Vec<Racer>, Vec<RacerHeat>), SyncError> {
-        info!(target: "sync", "collect_data");
-
-        let racers = self.select_racers()?;
-        let racer_heats = self.select_racer_heats_with_times()?;
-
-        Ok((racers, racer_heats))
-    }
-
-    fn select_racers(&self) -> Result<Vec<Racer>, SyncError> {
-        info!(target: "sync", "select_racers");
-        let mut stmt = self
-            .conn
-            .prepare(
-                "SELECT
-                  RacerID as 'racer_id',
-                  LastName as 'last_name',
-                  FirstName as 'first_name',
-                  CarNumber as 'car_number',
-                  CarName as 'car_name',
-                  Class as 'group',
-                  Rank as 'rank'
-                FROM qryRoster qr",
-            )
-            .map_err(|e| SyncError::DatabaseError(e))?;
-        let racer_iter = stmt
-            .query_map(params![], |row| {
-                Ok(Racer {
-                    racer_id: row.get(0)?,
-                    last_name: row.get(1)?,
-                    first_name: row.get(2)?,
-                    car_number: row.get(3)?,
-                    car_name: row.get(4)?,
-                    group: row.get(5)?,
-                    rank: row.get(6)?,
-                })
-            })
-            .map_err(|e| SyncError::DatabaseError(e))?;
-
-        let mut racers = Vec::new();
-        for racer in racer_iter {
-            racers.push(racer.map_err(|e| SyncError::DatabaseError(e))?);
-        }
-
-        Ok(racers)
-    }
-
-    fn select_racer_heats_with_times(&self) -> Result<Vec<RacerHeat>, SyncError> {
-        info!(target: "sync", "select_racer_heats_with_times");
-        let mut stmt = self
-            .conn
-            .prepare(
-                "SELECT
-                  ri.CarNumber as 'car_number',
-                  ri.RacerID as 'racer_id',
-                  rc.Heat as 'heat_number',
-                  rc.FinishTime as 'finish_seconds',
-                  rc.FinishPlace as 'finish_place',
-                  c.Class as 'group',
-                  rc.Lane as 'lane_number',
-                  CAST(STRFTIME('%s', rc.Completed) as bigin) as 'finished_at_unix',
-                  rc.ResultID as 'result_id'
-                FROM RaceChart rc
-                INNER JOIN RegistrationInfo ri ON rc.RacerID = ri.RacerID
-                INNER JOIN Classes c ON c.ClassID = rc.ClassID
-                INNER JOIN Ranks rk ON rk.RankID = ri.RankID",
-            )
-            .map_err(|e| SyncError::DatabaseError(e))?;
-
-        let racer_heat_iter = stmt
-            .query_map(params![], |row| {
-                Ok(RacerHeat {
-                    car_number: row.get(0)?,
-                    racer_id: row.get(1)?,
-                    heat_number: row.get(2)?,
-                    finish_seconds: row.get(3)?,
-                    finish_place: row.get(4)?,
-                    group: row.get(5)?,
-                    lane_number: row.get(6)?,
-                    finished_at_unix: row.get(7)?,
-                    result_id: row.get(8)?,
-                })
-            })
-            .map_err(|e| SyncError::DatabaseError(e))?;
-
-        let mut racer_heats = Vec::new();
-        for racer_heat in racer_heat_iter {
-            racer_heats.push(racer_heat.map_err(|e| SyncError::DatabaseError(e))?);
-        }
-
-        Ok(racer_heats)
-    }
-}
-
 impl Uploader {
     fn new(api_key: String, event_key: String, server_url: String) -> Uploader {
         Uploader {
@@ -412,8 +284,8 @@ impl Uploader {
 
     async fn upload(
         &self,
-        racers: Vec<Racer>,
-        racer_heats: Vec<RacerHeat>,
+        racers: Vec<database::Racer>,
+        racer_heats: Vec<database::RacerHeat>,
     ) -> Result<(), SyncError> {
         let client = reqwest::Client::new();
         let request_data = RequestData {
