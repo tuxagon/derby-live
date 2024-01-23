@@ -1,13 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { apiKey, eventKey, serverUrl } from "./stores";
+  import { apiKey, eventKey, serverUrl } from "./lib/stores";
   import { invoke } from "@tauri-apps/api/tauri";
-
-  export let settingsOpen: boolean = true;
+  import { WebviewWindow } from "@tauri-apps/api/window";
 
   onMount(() => {
     console.log("onMount Settings");
-    invoke("fetch_app_settings").then((settings) => {
+    invoke("fetch_app_settings").then((settings: any) => {
       apiKey.set(settings.apiKey as string);
       eventKey.set(settings.eventKey as string);
       serverUrl.set(settings.serverUrl as string);
@@ -39,11 +38,17 @@
       apiKey: inputApiKey,
       eventKey: inputEventKey,
     });
-    settingsOpen = false;
+    WebviewWindow.getByLabel("manageAppSettings")
+      ?.close()
+      .then(() => {
+        console.log("closed");
+      });
   }
 </script>
 
-<div>
+<main class="px-4">
+  <h1>App Settings</h1>
+
   <p>{currentServerUrl}</p>
   <form class="flex flex-row flex-wrap" on:submit|preventDefault={save}>
     <input
@@ -58,9 +63,13 @@
     />
     <button type="submit">Save</button>
   </form>
-</div>
+</main>
 
 <style>
+  h1 {
+    @apply text-4xl font-bold text-orange-600 py-2 border-b-2 border-orange-600 border-solid;
+  }
+
   input,
   button {
     @apply mr-5 mt-5;
