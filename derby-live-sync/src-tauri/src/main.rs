@@ -8,68 +8,17 @@ extern crate tauri;
 mod client_notify;
 mod database;
 mod logger;
+mod settings;
 mod synchronize;
 
 use log::info;
-use serde::{Deserialize, Serialize};
+use settings::AppSettings;
 use std::{
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::{Arc, Mutex},
 };
 use synchronize::{SyncCreationError, SyncState, Synchronizer};
 use tauri::Manager;
-
-fn get_server_url() -> String {
-    #[cfg(feature = "production")]
-    {
-        "https://derby-live.fly.dev".to_string()
-    }
-    #[cfg(not(feature = "production"))]
-    {
-        "http://localhost:4000".to_string()
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-struct AppSettings {
-    api_key: Option<String>,
-    event_key: Option<String>,
-    database_path: Option<PathBuf>,
-    server_url: String,
-}
-
-impl Default for AppSettings {
-    fn default() -> Self {
-        let url = get_server_url();
-
-        Self {
-            api_key: Default::default(),
-            event_key: Default::default(),
-            database_path: Default::default(),
-            server_url: url,
-        }
-    }
-}
-
-impl AppSettings {
-    fn current_database_path(&self) -> String {
-        self.database_path
-            .as_ref()
-            .map(|p| p.to_string_lossy().to_string())
-            .unwrap_or_default()
-    }
-
-    fn update_database_path_if_exists<P: AsRef<Path>>(&mut self, path: P) {
-        if path.as_ref().exists() {
-            self.database_path = Some(path.as_ref().to_path_buf());
-        }
-    }
-
-    fn update_server_url(&mut self, url: String) {
-        self.server_url = url;
-    }
-}
 
 struct AppState {
     app_settings: AppSettings,
@@ -119,22 +68,6 @@ fn try_create_synchronizer(
     Ok(Synchronizer::new(sync_state))
 }
 
-async fn write_settings(app_settings: AppSettings) -> Result<(), tauri::Error> {
-    let cloned_settings = app_settings.clone();
-
-    info!(target: "operation", "write_settings: {:?}", cloned_settings);
-
-    tauri::async_runtime::spawn(async move {
-        let cwd = std::env::current_dir();
-        let file_path = cwd.unwrap().join("settings.json");
-        let file_contents = serde_json::to_string_pretty(&cloned_settings).unwrap();
-        std::fs::write(file_path, file_contents).unwrap();
-    })
-    .await?;
-
-    Ok(())
-}
-
 #[tauri::command]
 fn fetch_app_settings(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> AppSettings {
     let app_settings = extract_app_settings(app_state);
@@ -165,7 +98,9 @@ async fn choose_database(
             client_notify::database_chosen(Arc::new(app_handle), chosen_file_path);
         }
 
-        tauri::async_runtime::spawn(write_settings(state.lock().unwrap().app_settings.clone()));
+        tauri::async_runtime::spawn(AppSettings::write(
+            state.lock().unwrap().app_settings.clone(),
+        ));
     });
 
     Ok(())
@@ -187,7 +122,9 @@ async fn save_settings(
         state_locked.app_settings.event_key = Some(event_key.clone());
     }
 
-    tauri::async_runtime::spawn(write_settings(state.lock().unwrap().app_settings.clone()));
+    tauri::async_runtime::spawn(AppSettings::write(
+        state.lock().unwrap().app_settings.clone(),
+    ));
 
     Ok(())
 }
@@ -238,21 +175,12 @@ fn main() {
     tauri::Builder::default()
         .manage::<Arc<Mutex<AppState>>>(Default::default())
         .setup(|app| {
-            let cwd = std::env::current_dir();
-            info!(target: "setup", "cwd: {:?}", cwd);
-            let file_contents = std::fs::read_to_string(cwd.unwrap().join("settings.json"));
-            match file_contents {
-                Ok(contents) => {
-                    info!(target: "setup", "contents: {:?}", contents);
-                    info!(target: "setup", "parsed contents: {:?}", serde_json::from_str::<AppSettings>(&contents));
-                    let app_settings: AppSettings =
-                        serde_json::from_str(&contents).unwrap_or_else(|_| AppSettings::default());
-                    info!(target: "setup", "app_settings: {:?}", app_settings);
-
+            match AppSettings::load() {
+                Ok(app_settings) => {
                     let state: tauri::State<'_, Arc<Mutex<AppState>>> = app.state();
+
                     let mut state_locked = state.lock().unwrap();
                     state_locked.app_settings = app_settings;
-                    state_locked.app_settings.update_server_url(get_server_url());
                 }
                 Err(_) => {
                     info!(target: "setup", "no settings.json found");
