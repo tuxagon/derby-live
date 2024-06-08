@@ -19,7 +19,7 @@
 
   let inputApiKey = "";
   let inputEventKey = "";
-  let currentServerUrl = "";
+  let inputServerUrl = "";
 
   apiKey.subscribe((key) => {
     inputApiKey = key;
@@ -28,15 +28,17 @@
     inputEventKey = key;
   });
   serverUrl.subscribe((url) => {
-    currentServerUrl = url;
+    inputServerUrl = url;
   });
 
   async function save() {
     apiKey.set(inputApiKey);
     eventKey.set(inputEventKey);
+    serverUrl.set(inputServerUrl);
     await invoke("save_settings", {
       apiKey: inputApiKey,
       eventKey: inputEventKey,
+      serverUrl: inputServerUrl,
     });
     WebviewWindow.getByLabel("manageAppSettings")
       ?.close()
@@ -49,18 +51,31 @@
 <main class="px-4">
   <h1>App Settings</h1>
 
-  <p>{currentServerUrl}</p>
-  <form class="flex flex-row flex-wrap" on:submit|preventDefault={save}>
-    <input
-      id="api-key-input"
-      placeholder="Enter API Key..."
-      bind:value={inputApiKey}
-    />
-    <input
-      id="event-key-input"
-      placeholder="Enter Event Key..."
-      bind:value={inputEventKey}
-    />
+  <form class="flex flex-col flex-wrap" on:submit|preventDefault={save}>
+    <fieldset>
+      <label for="api-key-input">API Key</label>
+      <input
+        id="api-key-input"
+        placeholder="Enter API Key..."
+        bind:value={inputApiKey}
+      />
+    </fieldset>
+    <fieldset>
+      <label for="event-key-input">Event Key</label>
+      <input
+        id="event-key-input"
+        placeholder="Enter Event Key..."
+        bind:value={inputEventKey}
+      />
+    </fieldset>
+    <fieldset>
+      <label for="server-url-input">Server URL</label>
+      <input
+        id="server-url-input"
+        placeholder="Enter Server URL..."
+        bind:value={inputServerUrl}
+      />
+    </fieldset>
     <button type="submit">Save</button>
   </form>
 </main>

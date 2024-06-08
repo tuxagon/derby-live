@@ -48,6 +48,12 @@ h1 {
   text-align: center;
 }
 
+label {
+  font-weight: 600;
+  font-size: 1em;
+  margin-right: 1em;
+}
+
 input,
 button {
   border-radius: 8px;

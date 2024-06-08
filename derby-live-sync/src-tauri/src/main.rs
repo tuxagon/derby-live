@@ -45,10 +45,11 @@ fn fetch_database_path(app_state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Str
 async fn save_settings(
     api_key: String,
     event_key: String,
+    server_url: String,
     app_state: tauri::State<'_, Arc<Mutex<AppState>>>,
 ) -> Result<(), ()> {
     info!(target: "command", "save_settings");
-    app_cmds::save_settings(api_key, event_key, app_state).await
+    app_cmds::save_settings(api_key, event_key, server_url, app_state).await
 }
 
 #[tauri::command]
