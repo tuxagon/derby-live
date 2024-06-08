@@ -1,20 +1,26 @@
-<.header>
-  Event <%= @event.id %>
-  <:subtitle>This is a event record from your database.</:subtitle>
-  <:actions>
-    <.link patch={~p"/events/#{@event}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit event</.button>
-    </.link>
-  </:actions>
-</.header>
+<div class="px-4">
+  <.header>
+    Event <%= @event.id %>
+    <:subtitle>This is a event record from your database.</:subtitle>
+    <:actions>
+      <.link patch={~p"/events/#{@event}/show/edit"} phx-click={JS.push_focus()}>
+        <.button>Edit event</.button>
+      </.link>
+    </:actions>
+  </.header>
 
-<.list>
-  <:item title="Name"><%= @event.name %></:item>
-  <:item title="Url prefix"><%= @event.key %></:item>
-  <:item title="Status"><%= @event.status %></:item>
-</.list>
+  <div class="mt-8">
+    <strong><.link navigate={~p"/#{@event.key}/heats"}>Go to Heat</.link></strong>
+  </div>
 
-<.back navigate={~p"/events"}>Back to events</.back>
+  <.list>
+    <:item title="Name"><%= @event.name %></:item>
+    <:item title="Url prefix"><%= @event.key %></:item>
+    <:item title="Status"><%= @event.status %></:item>
+  </.list>
+
+  <.back navigate={~p"/events"}>Back to events</.back>
+</div>
 
 <.modal
   :if={@live_action == :edit}
