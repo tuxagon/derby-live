@@ -46,10 +46,6 @@ defmodule DerbyLiveWeb.HeatComponent do
     """
   end
 
-  defp human_time(time) do
-    Timex.from_now(time)
-  end
-
   defp place_ordinal(1), do: "1st"
   defp place_ordinal(2), do: "2nd"
   defp place_ordinal(3), do: "3rd"
