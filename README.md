@@ -24,6 +24,12 @@ Deploying to Fly until deploy is in CI
 fly deploy
 ```
 
+IEx
+
+```
+fly ssh console --pty --select -C "/app/bin/derby_live remote"
+```
+
 #### Sync app
 
 This is handled with the Release Sync workflow, which is manually triggered for now.
