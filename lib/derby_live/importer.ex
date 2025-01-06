@@ -21,7 +21,7 @@ defmodule DerbyLive.Importer do
 
   defp cast_data(data, mod) do
     data
-    |> Map.take(mod.importable_fields)
+    |> Map.take(mod.importable_fields())
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
     |> Enum.into(%{})
   end
