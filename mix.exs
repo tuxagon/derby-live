@@ -53,7 +53,8 @@ defmodule DerbyLive.MixProject do
       {:ex_machina, "~> 2.7.0", only: :test},
       {:faker, "~> 0.17"},
       {:phoenix_swoosh, "~> 1.0"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:changelog, "~> 0.1", only: [:dev, :test], runtime: false}
     ]
   end
 
