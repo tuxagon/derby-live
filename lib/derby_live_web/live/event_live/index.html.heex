@@ -12,7 +12,7 @@
 <div class="px-4">
   <.table id="events" rows={@streams.events}>
     <:col :let={{_id, event}} label="Name">
-      <.link navigate={~p"/#{event.key}/heats"}>
+      <.link href={~p"/#{event.key}/heats"} target="_blank">
         <%= event.name %>
         <.icon name="hero-arrow-top-right-on-square-solid" />
       </.link>
