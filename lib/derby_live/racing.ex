@@ -160,6 +160,12 @@ defmodule DerbyLive.Racing do
     |> Repo.update()
   end
 
+  def reset_event(%Event{} = event) do
+    from(rh in RacerHeat, where: rh.event_id == ^event.id) |> Repo.delete_all()
+    from(r in Racer, where: r.event_id == ^event.id) |> Repo.delete_all()
+    {:ok, event}
+  end
+
   def delete_event(%Event{} = event) do
     Repo.delete(event)
   end

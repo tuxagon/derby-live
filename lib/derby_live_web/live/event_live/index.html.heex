@@ -26,15 +26,15 @@
       | <.link patch={~p"/events/#{event}/edit"}>Edit</.link>
     </:action>
     <:action :let={{id, event}}>
-      <.link phx-click={JS.push("archive", value: %{id: event.id})} data-confirm="Are you sure?">
-        Archive
-      </.link>
-      |
       <.link
         phx-click={JS.push("delete", value: %{id: event.id}) |> hide("##{id}")}
         data-confirm="Are you sure?"
       >
         Delete
+      </.link>
+      |
+      <.link phx-click={JS.push("reset", value: %{id: event.id})} data-confirm="Are you sure?">
+        Reset
       </.link>
     </:action>
   </.table>
