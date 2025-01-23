@@ -59,4 +59,14 @@ defmodule DerbyLiveWeb.EventLive.Index do
      |> put_flash(:info, "Event archived successfully")
      |> stream_insert(:events, event)}
   end
+
+  def handle_event("reset", %{"id" => id}, socket) do
+    event = Racing.get_event!(id)
+    {:ok, event} = Racing.reset_event(event)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, "Event reset successfully")
+     |> stream_insert(:events, event)}
+  end
 end

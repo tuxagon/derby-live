@@ -1,7 +1,7 @@
 <div class="flex justify-between items-center bg-slate-700">
   <div class="font-bold px-1 text-white">
     <%= for c <- String.graphemes("Heat #{@heat.heat_number}") do %>
-      <p class="py-1 text-center"><%= c %></p>
+      <p class="py-1 text-center">{c}</p>
     <% end %>
   </div>
 
@@ -9,7 +9,7 @@
     <%= for lane <- @heat.lanes do %>
       <div class={"relative h-24 border-r-2 bg-slate-100 border-slate-700 #{if lane == Enum.at(@heat.lanes, 0), do: "", else: "border-t-2"}"}>
         <p class="absolute text-sm px-1 top-1 left-0 border-r border-y border-slate-700 rounded-r-md font-mono">
-          <%= lane.racer_heat.lane_number %>
+          {lane.racer_heat.lane_number}
         </p>
 
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -22,9 +22,9 @@
         </div>
 
         <p class="absolute text-sm bottom-0 left-1 font-mono">
-          <%= "##{lane.racer.car_number}" %>
+          {"##{lane.racer.car_number}"}
           <span class="italic">
-            <%= if lane.racer.car_name == nil, do: "", else: "(#{lane.racer.car_name})" %>
+            {if lane.racer.car_name == nil, do: "", else: "(#{lane.racer.car_name})"}
           </span>
         </p>
       </div>
@@ -32,15 +32,15 @@
       <div class={"relative col-span-3 bg-slate-100 border-slate-700 #{if lane == Enum.at(@heat.lanes, 0), do: "", else: "border-t-2"}"}>
         <div class="absolute top-0 right-0 flex p-1">
           <div class="text-xs italic mr-1 rounded-md border h-fit px-1 bg-cubs-blue border-gray-600 font-bold text-white">
-            <%= lane.racer.group %>
+            {lane.racer.group}
           </div>
           <div class="text-xs italic mr-1 rounded-md border h-fit px-1 bg-cubs-yellow border-gray-600 font-bold">
-            <%= lane.racer.rank %>
+            {lane.racer.rank}
           </div>
         </div>
 
         <p class="absolute top-1/2 left-1 transform -translate-y-1/2 pl-4">
-          <%= lane.racer.first_name %> <%= lane.racer.last_name %>
+          {lane.racer.first_name} {lane.racer.last_name}
           <%= cond do %>
             <% lane.racer_heat.finish_place == 1 -> %>
               🥇
@@ -55,7 +55,7 @@
         <%= if lane.racer_heat.finish_place do %>
           <div class="absolute bottom-0 pl-1 left-0">
             <p class="text-xs italic">
-              Finished <%= place_ordinal(lane.racer_heat.finish_place) %> in <%= lane.racer_heat.finish_seconds %> seconds
+              Finished {place_ordinal(lane.racer_heat.finish_place)} in {lane.racer_heat.finish_seconds} seconds
             </p>
           </div>
         <% end %>

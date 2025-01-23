@@ -41,7 +41,7 @@ defmodule DerbyLiveWeb.HeatComponent do
         @class
       ]}
     >
-      <%= String.pad_leading(@heat_number |> to_string, 2, "0") %>
+      {String.pad_leading(@heat_number |> to_string, 2, "0")}
     </button>
     """
   end
