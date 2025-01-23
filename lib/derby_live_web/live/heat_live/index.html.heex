@@ -1,12 +1,12 @@
 <div class="mx-auto max-w-screen-md px-2">
   <div class="text-3xl font-bold mb-4 pr-4 text-center">
-    <h1><%= @event.name %></h1>
+    <h1>{@event.name}</h1>
   </div>
 
   <%= if @current_heat do %>
     <div class="flex flex-col justify-center items-center my-2">
       <.button phx-click="toggle_heat_selection">
-        <%= if @show_heat_selection, do: "Hide Individual Heats", else: "Show Individual Heats" %>
+        {if @show_heat_selection, do: "Hide Individual Heats", else: "Show Individual Heats"}
       </.button>
       <%= if @show_heat_selection do %>
         <div class="flex flex-wrap my-4 gap-2 font-mono justify-center items-start">
@@ -57,7 +57,7 @@
         Previous Heat
       </.button>
       <%= if @current_heat_changed && @selected_heat != @current_heat do %>
-        <p class="text-sm">Heat <%= @current_heat.heat_number %> on deck</p>
+        <p class="text-sm">Heat {@current_heat.heat_number} on deck</p>
       <% end %>
       <.button
         phx-click="select_current_heat"

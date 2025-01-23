@@ -5,7 +5,7 @@
       <ul>
         <%= for {_dom_id, racer} <- @streams.racers do %>
           <li>
-            <%= racer.car_number %> - <%= racer.first_name %> <%= racer.last_name %>
+            {racer.car_number} - {racer.first_name} {racer.last_name}
           </li>
         <% end %>
       </ul>

@@ -1,6 +1,6 @@
 <div class="px-4">
   <.header>
-    Event <%= @event.id %>
+    Event {@event.id}
     <:subtitle>This is a event record from your database.</:subtitle>
     <:actions>
       <.link patch={~p"/events/#{@event}/show/edit"} phx-click={JS.push_focus()}>
@@ -14,9 +14,9 @@
   </div>
 
   <.list>
-    <:item title="Name"><%= @event.name %></:item>
-    <:item title="Url prefix"><%= @event.key %></:item>
-    <:item title="Status"><%= @event.status %></:item>
+    <:item title="Name">{@event.name}</:item>
+    <:item title="Url prefix">{@event.key}</:item>
+    <:item title="Status">{@event.status}</:item>
   </.list>
 
   <.back navigate={~p"/events"}>Back to events</.back>
