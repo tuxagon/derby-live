@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for derby-live on 2024-06-08T00:10:14-04:00
+# fly.toml app configuration file generated for derby-live on 2025-01-23T22:29:48-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -11,26 +11,28 @@ swap_size_mb = 512
 [build]
 
 [deploy]
-  release_command = '/app/bin/migrate'
+release_command = '/app/bin/migrate'
 
 [env]
-  PHX_HOST = 'derby-live.fly.dev'
-  PORT = '8080'
+PHX_HOST = 'derby-live.fly.dev'
+PORT = '8080'
+MAILER_FROM_NAME = 'Derby Live'
+MAILER_FROM_ADDRESS = 'noreply@pack102.net'
 
 [http_service]
-  internal_port = 8080
-  force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+internal_port = 8080
+force_https = true
+auto_stop_machines = 'stop'
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
 
-  [http_service.concurrency]
-    type = 'connections'
-    hard_limit = 1000
-    soft_limit = 1000
+[http_service.concurrency]
+type = 'connections'
+hard_limit = 1000
+soft_limit = 1000
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+memory = '1gb'
+cpu_kind = 'shared'
+cpus = 1
