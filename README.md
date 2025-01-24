@@ -24,10 +24,14 @@ MAILER_FROM_ADDRESS=
 fly launch
 ```
 
-2. Set up the secrets
+2. Set up the secrets. Note that the `MAILER_FROM_ADDRESS` must match the verifed sender in Sendgrid
+
+**NOTE**: It was getting to be incredibly frustrating to debug why emails were getting rate-limited and not worth the hassle of setting up a domain. @gmail.com from this app seems to have caused the emails to be problematic. Details were not worth diving further into, so for now, `EMAIL_BYPASS_KEY` will be a code that can be used to skip emailing and log in as the only user. This obviously will not work with more than one, but that's not really how this app is used at the moment since it gets torn down after the derby and restood the following year.
 
 ```
 fly secrets set SENDGRID_API_KEY=<redacted>
+fly secrets set MAILER_FROM_ADDRESS=<redacted>
+fly secrets set EMAIL_BYPASS_KEY=<redacted>
 ```
 
 3. Using remote IEx, set up the admin user and grab the API key

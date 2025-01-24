@@ -10,18 +10,28 @@ defmodule DerbyLiveWeb.AuthController do
   end
 
   def login(conn, %{"email" => email}) do
-    case Account.get_user_by_email(email) do
-      %Account.User{} = user ->
-        Account.send_login_link_email(user)
+    [email | bypass] = String.split(email, ":")
+    bypass_key = System.get_env("EMAIL_BYPASS_KEY")
 
-        conn
-        |> put_flash(:info, "Check your email for a login link")
-        |> redirect(to: ~p"/auth")
+    if bypass != [] and bypass_key == List.first(bypass) do
+      user = Account.get_user_by_email(email)
 
-      nil ->
-        conn
-        |> put_flash(:info, "Check your email for a login link")
-        |> redirect(to: ~p"/auth")
+      conn
+      |> UserAuth.log_in_user(user)
+    else
+      case Account.get_user_by_email(email) do
+        %Account.User{} = user ->
+          Account.send_login_link_email(user)
+
+          conn
+          |> put_flash(:info, "Check your email for a login link")
+          |> redirect(to: ~p"/auth")
+
+        nil ->
+          conn
+          |> put_flash(:info, "Check your email for a login link")
+          |> redirect(to: ~p"/auth")
+      end
     end
   end
 
