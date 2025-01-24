@@ -18,16 +18,33 @@ MAILER_FROM_ADDRESS=
 
 #### Website
 
-Deploying to Fly until deploy is in CI
+1. Creating the app on Fly.io requires first running
+
+```
+fly launch
+```
+
+2. Set up the secrets
+
+```
+fly secrets set SENDGRID_API_KEY=<redacted>
+```
+
+3. Using remote IEx, set up the admin user and grab the API key
+
+```
+script/fiex
+remote-iex> alias DerbyLive.Account
+remote-iex> admin_name = "Admin" # use real name
+remote-iex> admin_email = "example@admin.com" # use real email
+remote-iex> user = Account.register_user(%{name: admin_name, email: admin_email})
+remote-iex> user.api_key
+```
+
+When an update should be deployed, run
 
 ```
 fly deploy
-```
-
-IEx
-
-```
-fly ssh console --pty --select -C "/app/bin/derby_live remote"
 ```
 
 #### Sync app
