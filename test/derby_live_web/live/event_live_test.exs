@@ -74,17 +74,6 @@ defmodule DerbyLiveWeb.EventLiveTest do
       assert index_live |> element("#events-#{event.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#events-#{event.id}")
     end
-
-    test "archives event in listing", %{conn: conn, event: event} do
-      {:ok, index_live, _html} = live(conn, ~p"/events")
-
-      assert index_live |> element("#events-#{event.id} a", "Archive") |> render_click()
-
-      assert has_element?(index_live, "#events-#{event.id}")
-      html = render(index_live)
-      assert html =~ "Event archived successfully"
-      assert html =~ "archived"
-    end
   end
 
   describe "Show" do

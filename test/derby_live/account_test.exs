@@ -9,7 +9,10 @@ defmodule DerbyLive.AccountTest do
       |> DateTime.to_naive()
       |> NaiveDateTime.truncate(:second)
 
-    nowish < datetime && datetime < NaiveDateTime.add(nowish, 60 * 16)
+    sixteen_minutes_later = NaiveDateTime.add(nowish, 60 * 16)
+
+    NaiveDateTime.compare(nowish, datetime) == :lt &&
+      NaiveDateTime.compare(datetime, sixteen_minutes_later) == :lt
   end
 
   describe "get_user!/1" do

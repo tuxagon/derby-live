@@ -43,7 +43,7 @@ defmodule DerbyLiveWeb do
         layouts: [html: DerbyLiveWeb.Layouts]
 
       import Plug.Conn
-      import DerbyLiveWeb.Gettext
+      use Gettext, backend: DerbyLiveWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -86,7 +86,7 @@ defmodule DerbyLiveWeb do
       # Core UI components and translation
       import DerbyLiveWeb.CoreComponents
       import DerbyLiveWeb.SvgComponents
-      import DerbyLiveWeb.Gettext
+      use Gettext, backend: DerbyLiveWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
