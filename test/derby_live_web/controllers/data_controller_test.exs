@@ -8,8 +8,8 @@ defmodule DerbyLiveWeb.DataControllerTest do
   end
 
   test "POST /api/data for racers", %{conn: conn} do
-    user = insert(:user)
-    event = insert(:event, user: user)
+    user = insert_user()
+    event = insert_event(%{}, user)
 
     conn =
       conn
@@ -33,8 +33,8 @@ defmodule DerbyLiveWeb.DataControllerTest do
   end
 
   test "POST /api/data for racer_heats", %{conn: conn} do
-    user = insert(:user)
-    event = insert(:event, user: user)
+    user = insert_user()
+    event = insert_event(%{}, user)
 
     conn =
       conn
@@ -60,7 +60,7 @@ defmodule DerbyLiveWeb.DataControllerTest do
   end
 
   test "POST /api/data for invalid event key", %{conn: conn} do
-    user = insert(:user)
+    user = insert_user()
 
     conn =
       conn
@@ -80,6 +80,6 @@ defmodule DerbyLiveWeb.DataControllerTest do
         ]
       })
 
-    assert json_response(conn, 200) == %{"status" => "errror", "message" => "Invalid event key"}
+    assert json_response(conn, 200) == %{"status" => "error", "message" => "Invalid event key"}
   end
 end

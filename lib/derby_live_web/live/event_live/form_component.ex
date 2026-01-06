@@ -1,7 +1,7 @@
 defmodule DerbyLiveWeb.EventLive.FormComponent do
   use DerbyLiveWeb, :live_component
 
-  alias DerbyLive.Racing
+  alias DerbyLive.Racing.Event
 
   @impl true
   def render(assigns) do
@@ -29,65 +29,48 @@ defmodule DerbyLiveWeb.EventLive.FormComponent do
   end
 
   @impl true
-  def update(%{event: event} = assigns, socket) do
-    changeset = Racing.change_event(event)
+  def update(%{event: event, current_user: current_user} = assigns, socket) do
+    form =
+      if event do
+        AshPhoenix.Form.for_update(event, :update, as: "event")
+      else
+        AshPhoenix.Form.for_create(Event, :create,
+          as: "event",
+          prepare_source: fn changeset ->
+            Ash.Changeset.set_argument(changeset, :user_id, current_user.id)
+          end
+        )
+      end
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign_form(changeset)}
+     |> assign(:form, to_form(form))}
   end
 
   @impl true
   def handle_event("validate", %{"event" => event_params}, socket) do
-    changeset =
-      socket.assigns.event
-      |> Racing.change_event(event_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign_form(socket, changeset)}
+    form = AshPhoenix.Form.validate(socket.assigns.form.source, event_params)
+    {:noreply, assign(socket, :form, to_form(form))}
   end
 
   def handle_event("save", %{"event" => event_params}, socket) do
-    save_event(socket, socket.assigns.action, event_params)
-  end
-
-  defp save_event(socket, :edit, event_params) do
-    case Racing.update_event(socket.assigns.event, event_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form.source, params: event_params) do
       {:ok, event} ->
         notify_parent({:saved, event})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Event updated successfully")
+         |> put_flash(:info, flash_message(socket.assigns.action))
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, form} ->
+        {:noreply, assign(socket, :form, to_form(form))}
     end
   end
 
-  defp save_event(socket, :new, event_params) do
-    current_user = socket.assigns.current_user
-    event_params = Map.put(event_params, "user_id", current_user.id)
-
-    case Racing.create_event(event_params) do
-      {:ok, event} ->
-        notify_parent({:saved, event})
-
-        {:noreply,
-         socket
-         |> put_flash(:info, "Event created successfully")
-         |> push_patch(to: socket.assigns.patch)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
-    end
-  end
-
-  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
-    assign(socket, :form, to_form(changeset))
-  end
+  defp flash_message(:edit), do: "Event updated successfully"
+  defp flash_message(:new), do: "Event created successfully"
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end

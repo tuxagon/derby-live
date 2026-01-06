@@ -1,8 +1,8 @@
 defmodule DerbyLiveWeb.Router do
   use DerbyLiveWeb, :router
+  use AshAuthentication.Phoenix.Router
 
   import DerbyLiveWeb.ApiAuth
-  import DerbyLiveWeb.UserAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -11,7 +11,7 @@ defmodule DerbyLiveWeb.Router do
     plug :put_root_layout, html: {DerbyLiveWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug :fetch_current_user
+    plug :load_from_session
   end
 
   pipeline :api do
@@ -24,24 +24,40 @@ defmodule DerbyLiveWeb.Router do
     post "/data", DataController, :import
   end
 
+  # Public routes
   scope "/", DerbyLiveWeb do
     pipe_through :browser
 
-    get "/auth", AuthController, :index
-    post "/auth/login", AuthController, :login
-    delete "/auth/logout", AuthController, :logout
-    get "/auth/verify/:token", AuthController, :verify
-
+    # Public heat viewing (no auth required)
     live "/:event_key/heats", HeatLive.Index
-    # live "/:event_key/racers", RacerLive.Index
   end
 
-  ## Authentication routes
-
+  # Authentication routes
   scope "/", DerbyLiveWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through :browser
 
-    live_session :require_authenticated_user,
+    # Custom sign-in LiveView
+    live_session :auth,
+      on_mount: [{DerbyLiveWeb.UserAuth, :redirect_if_authenticated}] do
+      live "/sign-in", AuthLive.SignIn, :sign_in
+      live "/auth/magic-link/:token", AuthLive.MagicLink, :verify
+    end
+
+    # Sign out
+    get "/sign-out", AuthController, :sign_out
+
+    # Auth callback (for token storage after LiveView sign-in)
+    get "/auth/callback", AuthController, :callback
+
+    # AshAuthentication strategy routes (for magic link request handling)
+    auth_routes(AuthController, DerbyLive.Accounts.User, path: "/auth")
+  end
+
+  # Authenticated routes
+  scope "/", DerbyLiveWeb do
+    pipe_through [:browser]
+
+    ash_authentication_live_session :require_authenticated_user,
       on_mount: [{DerbyLiveWeb.UserAuth, :ensure_authenticated}] do
       live "/events", EventLive.Index, :index
       live "/events/new", EventLive.Index, :new

@@ -48,7 +48,7 @@
 >
   <.live_component
     module={DerbyLiveWeb.EventLive.FormComponent}
-    id={@event.id || :new}
+    id={(@event && @event.id) || :new}
     title={@page_title}
     action={@live_action}
     event={@event}

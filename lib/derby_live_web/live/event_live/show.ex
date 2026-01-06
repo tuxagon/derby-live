@@ -1,7 +1,7 @@
 defmodule DerbyLiveWeb.EventLive.Show do
   use DerbyLiveWeb, :live_view
 
-  alias DerbyLive.Racing
+  alias DerbyLive.Racing.Event
 
   @impl true
   def mount(_params, _session, socket) do
@@ -10,10 +10,12 @@ defmodule DerbyLiveWeb.EventLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
+    event = Ash.get!(Event, id)
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:event, Racing.get_event!(id))}
+     |> assign(:event, event)}
   end
 
   defp page_title(:show), do: "Show Event"

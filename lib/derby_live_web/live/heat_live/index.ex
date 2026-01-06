@@ -2,15 +2,18 @@ defmodule DerbyLiveWeb.HeatLive.Index do
   use DerbyLiveWeb, :live_view
   import DerbyLiveWeb.HeatComponent
 
-  alias DerbyLive.Racing
+  alias DerbyLive.Racing.Event
+  alias DerbyLive.Racing.Racer
+  alias DerbyLive.Racing.RacerHeat
   alias DerbyLive.Racing.Heat
+  alias DerbyLive.Racing.Lane
 
   @car_colors ~w(e04242 e07a42 e0c242 e0e042 7ae042 42e042 42e07a 42e0c2 42e0e0 427ae0 4242e0 7a42e0 c242e0 e042e0 c2427a)
 
   @impl true
   @spec mount(map, any, map) :: {:ok, any}
   def mount(%{"event_key" => event_key}, _session, socket) do
-    event = Racing.get_event_by_key(event_key)
+    event = get_event_by_key(event_key)
 
     socket =
       socket
@@ -22,7 +25,9 @@ defmodule DerbyLiveWeb.HeatLive.Index do
       )
       |> fetch_and_assign_heats(event)
 
-    Phoenix.PubSub.subscribe(DerbyLive.PubSub, "sync_updates:#{event.key}")
+    if event do
+      Phoenix.PubSub.subscribe(DerbyLive.PubSub, "sync_updates:#{event.key}")
+    end
 
     {:ok, socket}
   end
@@ -79,9 +84,22 @@ defmodule DerbyLiveWeb.HeatLive.Index do
     {:noreply, socket}
   end
 
+  defp fetch_and_assign_heats(socket, nil) do
+    assign(socket,
+      heats: [],
+      selected_heat: nil,
+      current_heat: nil,
+      current_heat_changed: false,
+      next_heat: nil,
+      finished_heats: [],
+      unfinished_heats: [],
+      heats_count: 0
+    )
+  end
+
   defp fetch_and_assign_heats(socket, event) do
     heats =
-      Racing.list_heats_for_event(event)
+      list_heats_for_event(event)
       |> Enum.map(fn heat ->
         heat
         |> Heat.sort_lanes_asc()
@@ -147,5 +165,42 @@ defmodule DerbyLiveWeb.HeatLive.Index do
       end)
 
     Heat.add_color_to_each_lane(heat, colors)
+  end
+
+  # Ash query helpers
+
+  defp get_event_by_key(key) do
+    Event
+    |> Ash.Query.for_read(:by_key, %{key: key})
+    |> Ash.read_one!()
+  end
+
+  defp list_heats_for_event(event) do
+    # Get all racer_heats for this event
+    racer_heats =
+      RacerHeat
+      |> Ash.Query.for_read(:for_event, %{event_id: event.id})
+      |> Ash.read!()
+
+    # Get all racers for this event, indexed by racer_id
+    racers =
+      Racer
+      |> Ash.Query.for_read(:for_event, %{event_id: event.id})
+      |> Ash.read!()
+      |> Map.new(fn r -> {r.racer_id, r} end)
+
+    # Group racer_heats by heat_number and build Heat structs
+    racer_heats
+    |> Enum.group_by(& &1.heat_number)
+    |> Enum.map(fn {heat_number, rhs} ->
+      lanes =
+        Enum.map(rhs, fn rh ->
+          racer = Map.get(racers, rh.racer_id)
+          %Lane{racer: racer, racer_heat: rh}
+        end)
+
+      %Heat{heat_number: heat_number, lanes: lanes}
+    end)
+    |> Enum.sort_by(& &1.heat_number)
   end
 end

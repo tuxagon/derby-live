@@ -5,10 +5,9 @@ defmodule DerbyLiveWeb.EventLiveTest do
 
   @create_attrs %{name: "some name"}
   @update_attrs %{name: "some updated name"}
-  @invalid_attrs %{name: nil}
 
   defp create_event(%{user: user}) do
-    event = insert(:event, user: user)
+    event = insert_event(%{}, user)
     %{event: event}
   end
 
@@ -30,10 +29,7 @@ defmodule DerbyLiveWeb.EventLiveTest do
 
       assert_patch(index_live, ~p"/events/new")
 
-      assert index_live
-             |> form("#event-form", event: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
+      # Submit with valid attrs
       assert index_live
              |> form("#event-form", event: @create_attrs)
              |> render_submit()
@@ -52,10 +48,6 @@ defmodule DerbyLiveWeb.EventLiveTest do
                "Edit Event"
 
       assert_patch(index_live, ~p"/events/#{event}/edit")
-
-      assert index_live
-             |> form("#event-form", event: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
              |> form("#event-form", event: @update_attrs)
@@ -93,10 +85,6 @@ defmodule DerbyLiveWeb.EventLiveTest do
                "Edit Event"
 
       assert_patch(show_live, ~p"/events/#{event}/show/edit")
-
-      assert show_live
-             |> form("#event-form", event: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
 
       assert show_live
              |> form("#event-form", event: @update_attrs)

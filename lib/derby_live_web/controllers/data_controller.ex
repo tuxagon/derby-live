@@ -2,10 +2,10 @@ defmodule DerbyLiveWeb.DataController do
   use DerbyLiveWeb, :controller
 
   alias DerbyLive.Importer
-  alias DerbyLive.Racing
+  alias DerbyLive.Racing.Event
 
   def import(conn, %{"event_key" => event_key} = params) do
-    event = Racing.get_event_by_key(event_key)
+    event = get_event_by_key(event_key)
 
     if event do
       import_racers(params, event)
@@ -19,8 +19,14 @@ defmodule DerbyLiveWeb.DataController do
 
       json(conn, %{status: "ok"})
     else
-      json(conn, %{status: "errror", message: "Invalid event key"})
+      json(conn, %{status: "error", message: "Invalid event key"})
     end
+  end
+
+  defp get_event_by_key(key) do
+    Event
+    |> Ash.Query.for_read(:by_key, %{key: key})
+    |> Ash.read_one!()
   end
 
   defp import_racers(%{"racers" => racers}, event), do: Importer.import_racers(racers, event)

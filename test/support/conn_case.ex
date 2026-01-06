@@ -38,13 +38,27 @@ defmodule DerbyLiveWeb.ConnCase do
   end
 
   def register_and_log_in_user(%{conn: conn}) do
-    user = DerbyLive.Factory.insert(:user)
+    user = DerbyLive.Factory.insert_user()
     %{conn: log_in_user(conn, user), user: user}
   end
 
   def log_in_user(conn, user) do
+    # Generate a token for the user so we can store in session
+    # AshAuthentication expects users to have a token attached
+    {:ok, token, _claims} = AshAuthentication.Jwt.token_for_user(user)
+
+    # Store the token in the tokens table (required when require_token_presence_for_authentication? is true)
+    DerbyLive.Accounts.Token
+    |> Ash.Changeset.for_create(:store_token, %{
+      token: token,
+      purpose: "user"
+    })
+    |> Ash.create!()
+
+    user_with_token = Ash.Resource.put_metadata(user, :token, token)
+
     conn
     |> Phoenix.ConnTest.init_test_session(%{})
-    |> Plug.Conn.put_session(:current_user_id, user.id)
+    |> AshAuthentication.Plug.Helpers.store_in_session(user_with_token)
   end
 end
