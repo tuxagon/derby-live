@@ -8,7 +8,17 @@
 import Config
 
 config :derby_live,
-  ecto_repos: [DerbyLive.Repo]
+  ecto_repos: [DerbyLive.Repo],
+  ash_domains: [DerbyLive.Accounts, DerbyLive.Racing]
+
+# Ash configuration
+config :ash,
+  include_embedded_source_by_default?: false,
+  default_page_type: :keyset,
+  policies: [no_filter_static_forbidden_reads?: false]
+
+# Token signing secret for AshAuthentication
+config :derby_live, :token_signing_secret, "super_secret_key_change_in_prod"
 
 # Configures the endpoint
 config :derby_live, DerbyLiveWeb.Endpoint,

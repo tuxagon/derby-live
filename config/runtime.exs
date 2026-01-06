@@ -109,6 +109,9 @@ if config_env() == :prod do
       email: System.get_env("MAILER_FROM_ADDRESS")
     }
 
+  # Token signing secret for AshAuthentication
+  config :derby_live, :token_signing_secret, System.get_env("TOKEN_SIGNING_SECRET")
+
   #
   # For this example you need include a HTTP client required by Swoosh API client.
   # Swoosh supports Hackney and Finch out of the box:
