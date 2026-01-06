@@ -60,18 +60,6 @@ defmodule DerbyLive.Accounts.User do
       public?(false)
     end
 
-    # Legacy fields - kept for backward compatibility during migration
-    # These will be removed after full migration to AshAuthentication tokens
-    attribute :auth_token, :string do
-      allow_nil?(true)
-      public?(false)
-    end
-
-    attribute :auth_token_expires_at, :naive_datetime do
-      allow_nil?(true)
-      public?(false)
-    end
-
     create_timestamp(:inserted_at)
     update_timestamp(:updated_at)
   end
