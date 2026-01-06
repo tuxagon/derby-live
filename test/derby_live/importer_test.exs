@@ -1,6 +1,8 @@
 defmodule DerbyLive.ImporterTest do
   use DerbyLive.DataCase, async: true
 
+  import DerbyLive.Factory
+
   alias DerbyLive.Importer
   alias DerbyLive.Racing.Racer
   alias DerbyLive.Racing.RacerHeat
@@ -34,7 +36,7 @@ defmodule DerbyLive.ImporterTest do
   end
 
   test "import_racers/2 imports racers" do
-    event = insert(:event)
+    event = insert_event()
 
     racers = [
       %{
@@ -48,7 +50,7 @@ defmodule DerbyLive.ImporterTest do
       }
     ]
 
-    assert [{:ok, racer}] = Importer.import_racers(racers, event)
+    assert [racer] = Importer.import_racers(racers, event)
 
     assert racer_to_map(racer) == %{
              "racer_id" => 1,
@@ -63,12 +65,12 @@ defmodule DerbyLive.ImporterTest do
   end
 
   test "import_racers/2 updates existing racer instead of creating new" do
-    event = insert(:event)
-    racer = insert(:racer, event: event)
+    event = insert_event()
+    existing_racer = insert_racer(%{racer_id: 999}, event)
 
     racers = [
       %{
-        "racer_id" => racer.racer_id,
+        "racer_id" => 999,
         "first_name" => "John",
         "last_name" => "Doe",
         "rank" => "Tigers",
@@ -78,16 +80,17 @@ defmodule DerbyLive.ImporterTest do
       }
     ]
 
-    count_before = Repo.aggregate(Racer, :count, :racer_id)
+    count_before = Repo.aggregate(Racer, :count, :id)
 
-    assert [{:ok, racer}] = Importer.import_racers(racers, event)
+    assert [racer] = Importer.import_racers(racers, event)
 
-    count_after = Repo.aggregate(Racer, :count, :racer_id)
+    count_after = Repo.aggregate(Racer, :count, :id)
 
     assert count_before == count_after
+    assert racer.id == existing_racer.id
 
     assert racer_to_map(racer) == %{
-             "racer_id" => racer.racer_id,
+             "racer_id" => 999,
              "first_name" => "John",
              "last_name" => "Doe",
              "rank" => "Tigers",
@@ -99,7 +102,7 @@ defmodule DerbyLive.ImporterTest do
   end
 
   test "import_racer_heats/2 imports racer heats" do
-    event = insert(:event)
+    event = insert_event()
 
     racer_heats = [
       %{
@@ -126,8 +129,7 @@ defmodule DerbyLive.ImporterTest do
       }
     ]
 
-    assert [{:ok, racer_heat_1}, {:ok, racer_heat_2}] =
-             Importer.import_racer_heats(racer_heats, event)
+    assert [racer_heat_1, racer_heat_2] = Importer.import_racer_heats(racer_heats, event)
 
     assert racer_heat_to_map(racer_heat_1) == %{
              "result_id" => 1,
@@ -157,12 +159,12 @@ defmodule DerbyLive.ImporterTest do
   end
 
   test "import_racer_heats/2 updates existing racer heat instead of creating new" do
-    event = insert(:event)
-    racer_heat = insert(:racer_heat, event: event)
+    event = insert_event()
+    existing = insert_racer_heat(%{result_id: 888}, event)
 
     racer_heats = [
       %{
-        "result_id" => racer_heat.result_id,
+        "result_id" => 888,
         "car_number" => "101",
         "finish_place" => 1,
         "finish_seconds" => 2.0,
@@ -174,16 +176,17 @@ defmodule DerbyLive.ImporterTest do
       }
     ]
 
-    count_before = Repo.aggregate(RacerHeat, :count, :result_id)
+    count_before = Repo.aggregate(RacerHeat, :count, :id)
 
-    assert [{:ok, racer_heat}] = Importer.import_racer_heats(racer_heats, event)
+    assert [racer_heat] = Importer.import_racer_heats(racer_heats, event)
 
-    count_after = Repo.aggregate(RacerHeat, :count, :result_id)
+    count_after = Repo.aggregate(RacerHeat, :count, :id)
 
     assert count_before == count_after
+    assert racer_heat.id == existing.id
 
     assert racer_heat_to_map(racer_heat) == %{
-             "result_id" => racer_heat.result_id,
+             "result_id" => 888,
              "car_number" => 101,
              "finish_place" => 1,
              "finish_seconds" => 2.0,
