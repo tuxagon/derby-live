@@ -60,7 +60,10 @@ defmodule DerbyLive.MixProject do
       {:ash_postgres, "~> 2.0"},
       {:ash_phoenix, "~> 2.0"},
       {:ash_authentication, "~> 4.0"},
-      {:ash_authentication_phoenix, "~> 2.0"}
+      {:ash_authentication_phoenix, "~> 2.0"},
+      # SQLite for sync simulator (dev + test to avoid compilation warnings)
+      {:exqlite, "~> 0.34", only: [:dev, :test]},
+      {:req, "~> 0.5.17", only: [:dev, :test]}
     ]
   end
 
