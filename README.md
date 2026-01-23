@@ -16,6 +16,26 @@ MAILER_FROM_ADDRESS=
 
 ### Releases
 
+#### Database
+
+Fly changed to having managed postgres, so it will need to be
+
+```
+fly mpg create
+```
+
+Connecting to the cluster
+
+```
+fly mpg connect --cluster <cluster ID>
+```
+
+Then to attach to the app
+
+```
+fly mpg attach
+```
+
 #### Website
 
 1. Creating the app on Fly.io requires first running
@@ -32,6 +52,7 @@ fly launch
 fly secrets set SENDGRID_API_KEY=<redacted>
 fly secrets set MAILER_FROM_ADDRESS=<redacted>
 fly secrets set EMAIL_BYPASS_KEY=<redacted>
+fly secrets set TOKEN_SIGNING_SECRET=<redacted>
 ```
 
 3. Using remote IEx, set up the admin user and grab the API key
