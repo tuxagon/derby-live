@@ -117,3 +117,19 @@ INNER JOIN RegistrationInfo ri ON rc.RacerID = ri.RacerID
 INNER JOIN Classes c ON c.ClassID = rc.ClassID
 INNER JOIN Ranks rk ON rk.RankID = ri.RankID
 ```
+
+#### Troubleshooting
+
+Sending emails is annoying due to services requiring so much up front. A bypass for now in iEx
+
+```
+email = "user@example.com"
+
+{:ok, user} = DerbyLive.Accounts.User |> Ash.Query.for_read(:by_email, %{email: email}) |> Ash.read_one()
+
+{:ok, token, _claims} = AshAuthentication.Jwt.token_for_user(user)
+
+DerbyLive.Accounts.Token |> Ash.Changeset.for_create(:store_token, %{token: token, purpose: "user"}) |> Ash.create!()
+
+IO.puts("\n\nLogin URL:\nhttps://derby-live.fly.dev/auth/callback?token=#{token}\n")
+```
